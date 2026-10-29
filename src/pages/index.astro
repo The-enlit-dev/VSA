@@ -1,0 +1,498 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import Hero from '../components/Hero.astro'
+import SectionHead from '../components/SectionHead.astro'
+import CoachFeature from '../components/CoachFeature.astro'
+import EventCard from '../components/EventCard.astro'
+import Gallery from '../components/Gallery.astro'
+import CtaBand from '../components/CtaBand.astro'
+import FactText from '../components/FactText.astro'
+import Icon from '../components/Icon.astro'
+import { academy, registerHref } from '../data/site'
+import { coaches } from '../data/coaches'
+import { foundations, pathway, programmes } from '../data/training'
+import { photos } from '../data/gallery'
+import { getEvents } from '../lib/events'
+import { REVIEW_MODE, visible, isVisible } from '../lib/review'
+import ConfirmTag from '../components/ConfirmTag.astro'
+
+const { upcoming, past } = await getEvents()
+const shownCoaches = visible(coaches)
+const shownPhotos = visible(photos).slice(0, 6)
+
+const reasons = [
+  {
+    title: 'Led from the top',
+    text: 'Training at VSA is led by Sensei Preetam Ichake, the academy’s president.',
+  },
+  {
+    title: 'A clear grading pathway',
+    text: 'Belt examinations give every student a defined next step and a standard to work towards.',
+  },
+  {
+    title: 'A reason to compete',
+    text: 'Tournaments are announced through the academy, for students who want to test their karate.',
+  },
+  {
+    title: 'Easy to get started',
+    text: 'Send an enquiry online and the academy will reply with current batches, timings and fees.',
+  },
+]
+---
+
+<BaseLayout description={`${academy.name} (VSA) offers karate training led by Sensei Preetam Ichake, with graded belt examinations and tournament opportunities. Enquire about classes online.`}>
+  <Hero />
+
+  <!-- C. About -->
+  <section class="section on-light" id="about" aria-labelledby="about-title">
+    <div class="container about">
+      <div class="about__statement" data-reveal>
+        <p class="eyebrow">About the academy</p>
+        <h2 class="h2" id="about-title" style="margin-top: var(--s-5)">
+          Karate, taught as a <span class="accent">discipline</span>.
+        </h2>
+      </div>
+      <div class="about__body" data-reveal style="--reveal-i: 1">
+        <p class="lead">
+          {academy.name} — VSA — is a karate academy led by its president, {academy.president}. Students train
+          regularly, progress through graded belt examinations and can represent the academy at tournaments.
+        </p>
+        <dl class="facts">
+          <div><dt>President</dt><dd>{academy.president}</dd></div>
+          <div><dt>Discipline</dt><dd>Karate</dd></div>
+          {
+            isVisible(academy.area) && (
+              <div>
+                <dt>Based in</dt>
+                <FactText fact={academy.area} as="dd" />
+              </div>
+            )
+          }
+          <div><dt>Pathway</dt><dd>Training → belt exams → tournaments</dd></div>
+        </dl>
+        <a href="/about/" class="text-link">More about VSA <Icon name="arrow" /></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- D. Training -->
+  <section class="section" id="training" aria-labelledby="training-title">
+    <div class="container">
+      <SectionHead eyebrow="Training" title="The foundations of karate" id="training-title" split>
+        <p class="lead muted">
+          Every karate class returns to the same three foundations. Mastering them is what each belt examination
+          measures.
+        </p>
+      </SectionHead>
+
+      <ol class="foundations" role="list">
+        {
+          foundations.map((f, i) => (
+            <li class="foundation" data-reveal style={`--reveal-i: ${i}`}>
+              <span class="foundation__kanji jp" aria-hidden="true">{f.kanji}</span>
+              <h3 class="foundation__term">{f.term}</h3>
+              <p class="foundation__meaning">{f.meaning}</p>
+              <p class="muted">{f.description}</p>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="pathway" data-reveal>
+        <h3 class="pathway__title">The VSA pathway</h3>
+        <ol class="pathway__steps" role="list">
+          {
+            pathway.map((step, i) => (
+              <li>
+                <span class="pathway__n">{String(i + 1).padStart(2, '0')}</span>
+                <strong>{step.title}</strong>
+                <span class="muted">{step.description}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+
+      {
+        programmes.length > 0 ? (
+          <ul class="programmes" role="list">
+            {programmes.map((p) => (
+              <li class="programme" data-reveal>
+                <h3 class="h3">{p.name}</h3>
+                {p.audience && <p class="accent programme__audience">{p.audience}</p>}
+                <p class="muted">{p.description}</p>
+                {(p.schedule || p.location) && (
+                  <p class="programme__meta">{[p.schedule, p.location].filter(Boolean).join(' · ')}</p>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div class="empty programmes-empty" data-reveal>
+            <h3>Class options and timings</h3>
+            <p class="muted">
+              Send an enquiry for current batch timings, age groups and fees, and the academy will help you find the right
+              class.
+              {REVIEW_MODE && <ConfirmTag label="Programmes to add" source="No programme details were available; add them in src/data/training.ts" />}
+            </p>
+            <a href={registerHref} class="btn btn-primary">Ask about classes <Icon name="arrow" class="icon-arrow" /></a>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- E. Coaches -->
+  <section class="section on-light" id="coaches" aria-labelledby="coaches-title">
+    <div class="container">
+      <SectionHead eyebrow="Our coaches" title="Guided by experience" id="coaches-title" split>
+        <a href="/coaches/" class="text-link">All coaches <Icon name="arrow" /></a>
+      </SectionHead>
+      <div class="coach-stack">
+        {shownCoaches.slice(0, 2).map((coach, i) => <CoachFeature coach={coach} index={i} full={false} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- F. Events -->
+  <section class="section on-ink-2" id="events" aria-labelledby="events-title">
+    <div class="container">
+      <SectionHead eyebrow="Tournaments & belt exams" title="What’s next" id="events-title" split>
+        <a href="/events/" class="text-link">All events <Icon name="arrow" /></a>
+      </SectionHead>
+
+      <div class="events-split">
+        <div>
+          <h3 class="events-split__label">Upcoming</h3>
+          {
+            upcoming.length > 0 ? (
+              <div class="event-list">
+                {upcoming.slice(0, 3).map((e) => (
+                  <EventCard event={e} status="upcoming" headingLevel="h4" />
+                ))}
+              </div>
+            ) : (
+              <div class="empty" data-reveal>
+                <h4 class="h3">No upcoming events announced yet</h4>
+                <p class="muted">
+                  The next tournament or belt examination will be listed here as soon as the date is confirmed. Current
+                  students will also hear about it from their instructor.
+                </p>
+                <a href={registerHref} class="text-link">Ask the academy <Icon name="arrow" /></a>
+              </div>
+            )
+          }
+        </div>
+        {
+          past.length > 0 && (
+            <div>
+              <h3 class="events-split__label">Recent</h3>
+              <div class="event-list">
+                {past.slice(0, 2).map((e) => (
+                  <EventCard event={e} status="past" headingLevel="h4" />
+                ))}
+              </div>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- G. Gallery -->
+  <section class="section" id="gallery" aria-labelledby="gallery-title">
+    <div class="container">
+      <SectionHead eyebrow="Gallery" title="Life at the academy" id="gallery-title" split>
+        <a href="/gallery/" class="text-link">Full gallery <Icon name="arrow" /></a>
+      </SectionHead>
+      {
+        shownPhotos.length > 0 ? (
+          <Gallery photos={shownPhotos} id="home-gallery" uniform />
+        ) : (
+          <div class="empty">
+            <h3>Photos coming soon</h3>
+            <p class="muted">Photos from training, belt exams and tournaments will appear here.</p>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- H. Why VSA -->
+  <section class="section on-light" id="why" aria-labelledby="why-title">
+    <div class="container">
+      <SectionHead eyebrow="Why VSA" title="Why train at VSA" id="why-title" />
+      <ol class="reasons" role="list">
+        {
+          reasons.map((r, i) => (
+            <li class="reason" data-reveal style={`--reveal-i: ${i}`}>
+              <span class="reason__n">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="reason__title">{r.title}</h3>
+              <p class="muted">{r.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- I. Registration CTA -->
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .about {
+    display: grid;
+    gap: var(--s-7);
+  }
+
+  @media (min-width: 960px) {
+    .about {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--s-9);
+      align-items: start;
+    }
+  }
+
+  .about__body {
+    display: grid;
+    gap: var(--s-6);
+    justify-items: start;
+  }
+
+
+  /* Foundations */
+  .foundations {
+    display: grid;
+    gap: 1px;
+    margin: 0;
+    padding: 0;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  @media (min-width: 860px) {
+    .foundations {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .foundation {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--s-3);
+    padding: clamp(var(--s-6), 4vw, var(--s-8)) clamp(var(--s-5), 3vw, var(--s-7));
+    background: var(--ink);
+    overflow: hidden;
+    transition: background-color var(--dur-2) ease;
+  }
+
+  .foundation:hover {
+    background: var(--ink-2);
+  }
+
+  .foundation__kanji {
+    font-size: clamp(4rem, 7vw, 5.5rem);
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(255 255 255 / 0.4);
+    margin-bottom: var(--s-4);
+    transition: color var(--dur-2) ease;
+  }
+
+  .foundation:hover .foundation__kanji {
+    color: var(--red);
+    -webkit-text-stroke-color: var(--red);
+  }
+
+  .foundation__term {
+    font-size: var(--step-3);
+    text-transform: uppercase;
+  }
+
+  .foundation__meaning {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--red-on-dark);
+  }
+
+  /* Pathway */
+  .pathway {
+    display: grid;
+    gap: var(--s-5);
+    margin-top: clamp(var(--s-7), 6vw, var(--s-9));
+  }
+
+  @media (min-width: 960px) {
+    .pathway {
+      grid-template-columns: 14rem 1fr;
+      align-items: start;
+    }
+  }
+
+  .pathway__title {
+    font-size: var(--step-1);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .pathway__steps {
+    display: grid;
+    gap: var(--s-5);
+    margin: 0;
+    padding: 0;
+  }
+
+  @media (min-width: 760px) {
+    .pathway__steps {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .pathway__steps li {
+    display: grid;
+    gap: var(--s-2);
+    padding-top: var(--s-4);
+    border-top: 2px solid var(--line);
+    position: relative;
+  }
+
+  .pathway__steps li::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: var(--red);
+  }
+
+  .pathway__n {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--red-on-dark);
+  }
+
+  .programmes,
+  .programmes-empty {
+    margin-top: clamp(var(--s-7), 6vw, var(--s-9));
+  }
+
+  .programmes {
+    display: grid;
+    gap: var(--s-4);
+    padding: 0;
+  }
+
+  @media (min-width: 760px) {
+    .programmes {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+  }
+
+  .programme {
+    display: grid;
+    gap: var(--s-3);
+    padding: var(--s-6);
+    border: 1px solid var(--line);
+  }
+
+  .programme__audience {
+    font-weight: 700;
+  }
+
+  .programme__meta {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .coach-stack {
+    display: grid;
+    gap: var(--s-9);
+  }
+
+  /* Events */
+  .events-split {
+    display: grid;
+    gap: var(--s-7);
+  }
+
+  @media (min-width: 1040px) {
+    .events-split {
+      grid-template-columns: 1.4fr 1fr;
+      gap: var(--s-8);
+    }
+
+    .events-split:has(> :only-child) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .events-split__label {
+    margin-bottom: var(--s-4);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-variation-settings: 'wdth' 100;
+  }
+
+  /* Reasons */
+  .reasons {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 760px) {
+    .reasons {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .reasons {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .reason {
+    display: grid;
+    align-content: start;
+    gap: var(--s-3);
+    padding: var(--s-6) var(--s-5) var(--s-6) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  @media (min-width: 1100px) {
+    .reason {
+      border-bottom: 0;
+      padding-right: var(--s-6);
+    }
+
+    .reason + .reason {
+      padding-left: var(--s-6);
+      border-left: 1px solid var(--line);
+    }
+  }
+
+  .reason__n {
+    font-size: var(--step-3);
+    font-weight: 850;
+    color: var(--red);
+    font-variation-settings: 'wdth' 120;
+  }
+
+  .reason__title {
+    font-size: var(--step-1);
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+</style>

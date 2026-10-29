@@ -1,0 +1,25 @@
+{
+  "name": "vsa-karate",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "node scripts/test-site.mjs"
+  },
+  "dependencies": {
+    "astro": "^7.4.4"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@types/node": "^24.19.2",
+    "axe-core": "^4.14.0",
+    "typescript": "^6.0.3"
+  }
+}

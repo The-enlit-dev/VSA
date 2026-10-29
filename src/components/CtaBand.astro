@@ -1,0 +1,130 @@
+---
+import { registerHref } from '../data/site'
+import { phone, whatsappHref } from '../lib/contact'
+import Icon from './Icon.astro'
+
+interface Props {
+  title?: string
+  text?: string
+}
+
+const {
+  title = 'Your first class starts with a conversation.',
+  text = 'Tell the academy a little about who wants to train. They’ll reply with current batch timings, fees and how to get started.',
+} = Astro.props
+const wa = whatsappHref()
+---
+
+<section class="cta" aria-labelledby="cta-title">
+  <div class="container cta__inner">
+    <div data-reveal>
+      <p class="eyebrow cta__eyebrow">Register / Enquire</p>
+      <h2 class="display cta__title" id="cta-title">{title}</h2>
+    </div>
+    <div class="cta__aside" data-reveal style="--reveal-i: 1">
+      <p class="lead">{text}</p>
+      <div class="btn-row">
+        <a href={registerHref} class="btn cta__primary">Enquire about classes <Icon name="arrow" class="icon-arrow" /></a>
+        {
+          wa && (
+            <a href={wa} class="btn cta__secondary" target="_blank" rel="noopener noreferrer">
+              <Icon name="whatsapp" /> WhatsApp<span class="visually-hidden"> (opens WhatsApp)</span>
+            </a>
+          )
+        }
+        {
+          phone && (
+            <a href={phone.href} class="btn cta__secondary">
+              <Icon name="phone" /> Call
+            </a>
+          )
+        }
+      </div>
+    </div>
+  </div>
+  <span class="cta__kanji jp" aria-hidden="true">道</span>
+</section>
+
+<style>
+  .cta {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(4.5rem, 3rem + 6vw, 8rem);
+    background: var(--red);
+    color: var(--white);
+  }
+
+  .cta__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: var(--s-7);
+    align-items: end;
+  }
+
+  @media (min-width: 960px) {
+    .cta__inner {
+      grid-template-columns: 1.3fr 1fr;
+      gap: var(--s-9);
+    }
+  }
+
+  .cta__eyebrow {
+    color: rgb(255 255 255 / 0.85);
+  }
+
+  .cta__eyebrow::before {
+    background: var(--white);
+  }
+
+  .cta__title {
+    margin-top: var(--s-5);
+    font-size: var(--step-4);
+  }
+
+  .cta__aside {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .cta__aside .lead {
+    color: rgb(255 255 255 / 0.92);
+  }
+
+  .cta__primary {
+    --btn-bg: var(--white);
+    --btn-fg: var(--ink);
+    --btn-border: var(--white);
+  }
+
+  .cta__primary:hover {
+    --btn-bg: var(--ink);
+    --btn-fg: var(--white);
+    --btn-border: var(--ink);
+  }
+
+  .cta__secondary {
+    --btn-border: rgb(255 255 255 / 0.55);
+  }
+
+  .cta__secondary:hover {
+    --btn-bg: rgb(0 0 0 / 0.18);
+    --btn-border: var(--white);
+  }
+
+  .cta :focus-visible {
+    outline-color: var(--white);
+  }
+
+  .cta__kanji {
+    position: absolute;
+    right: -0.08em;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: clamp(14rem, 34vw, 30rem);
+    line-height: 1;
+    color: rgb(0 0 0 / 0.1);
+    pointer-events: none;
+    user-select: none;
+  }
+</style>

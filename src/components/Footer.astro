@@ -1,0 +1,234 @@
+---
+import { academy, contact, locations, nav, registerHref, siteCredit } from '../data/site'
+import { email, phone, visibleSocials, whatsappHref } from '../lib/contact'
+import { REVIEW_MODE, needsTag, visible } from '../lib/review'
+import ConfirmTag from './ConfirmTag.astro'
+import FactText from './FactText.astro'
+import Icon from './Icon.astro'
+import Logo from './Logo.astro'
+
+const wa = whatsappHref()
+const shownLocations = visible(locations)
+const year = new Date().getFullYear()
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <a href="/" class="site-footer__logo"><Logo /></a>
+        <p class="muted">{academy.tagline}</p>
+        <FactText fact={academy.area} as="p" class="muted site-footer__area" />
+      </div>
+
+      <nav class="site-footer__col" aria-label="Footer">
+        <h2 class="site-footer__heading">Academy</h2>
+        <ul>
+          <li><a href="/">Home</a></li>
+          {nav.map((item) => <li><a href={item.href}>{'title' in item ? item.title : item.label}</a></li>)}
+          <li><a href={registerHref}>Register / Enquire</a></li>
+        </ul>
+      </nav>
+
+      <div class="site-footer__col">
+        <h2 class="site-footer__heading">Contact</h2>
+        <ul class="site-footer__contact">
+          {
+            phone ? (
+              <li>
+                <a href={phone.href}><Icon name="phone" /> {phone.display}</a>
+                {needsTag(contact.phone) && <ConfirmTag source={contact.phone.source} />}
+              </li>
+            ) : (
+              REVIEW_MODE && (
+                <li class="muted">
+                  <Icon name="phone" /> Phone number <ConfirmTag source={contact.phone.source} label="To add" />
+                </li>
+              )
+            )
+          }
+          {
+            wa ? (
+              <li>
+                <a href={wa} target="_blank" rel="noopener noreferrer">
+                  <Icon name="whatsapp" /> WhatsApp us<span class="visually-hidden"> (opens WhatsApp)</span>
+                </a>
+              </li>
+            ) : (
+              REVIEW_MODE && (
+                <li class="muted">
+                  <Icon name="whatsapp" /> WhatsApp <ConfirmTag source={contact.whatsapp.source} label="To add" />
+                </li>
+              )
+            )
+          }
+          {
+            email ? (
+              <li>
+                <a href={email.href}><Icon name="mail" /> {email.display}</a>
+                {needsTag(contact.email) && <ConfirmTag source={contact.email.source} />}
+              </li>
+            ) : (
+              REVIEW_MODE && (
+                <li class="muted">
+                  <Icon name="mail" /> Email <ConfirmTag source={contact.emailNote} label="Conflict" />
+                </li>
+              )
+            )
+          }
+          {
+            visibleSocials.map((s) => (
+              <li>
+                <a href={s.url} target="_blank" rel="noopener noreferrer">
+                  <Icon name="instagram" /> {s.label} {s.handle}
+                  <span class="visually-hidden"> (opens in a new tab)</span>
+                </a>
+                {needsTag(s) && <ConfirmTag source={s.source} />}
+              </li>
+            ))
+          }
+          <li><a href={registerHref}><Icon name="arrow" /> Send an enquiry</a></li>
+        </ul>
+      </div>
+
+      {
+        shownLocations.length > 0 && (
+          <div class="site-footer__col">
+            <h2 class="site-footer__heading">Locations</h2>
+            <ul class="site-footer__locations">
+              {shownLocations.map((loc) => (
+                <li>
+                  <strong>
+                    {loc.name}
+                    {needsTag(loc) && <ConfirmTag source={loc.source} />}
+                  </strong>
+                  <span class="muted">{loc.address}</span>
+                  {loc.mapUrl && (
+                    <a href={loc.mapUrl} target="_blank" rel="noopener noreferrer">
+                      Open in Maps<span class="visually-hidden"> (opens in a new tab)</span>
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+
+    <div class="site-footer__bottom">
+      <p>© {year} {academy.name}. All rights reserved.</p>
+      {siteCredit && <p>{siteCredit}</p>}
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--ink);
+    border-top: 1px solid var(--line-on-dark);
+    padding-top: clamp(3.5rem, 7vw, 6rem);
+    font-size: 0.95rem;
+  }
+
+  .site-footer__top {
+    display: grid;
+    gap: var(--s-7);
+    grid-template-columns: 1fr;
+    padding-bottom: var(--s-8);
+  }
+
+  @media (min-width: 720px) {
+    .site-footer__top {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .site-footer__top {
+      grid-template-columns: 1.4fr 0.8fr 1.1fr 1.1fr;
+    }
+  }
+
+  .site-footer__brand {
+    display: grid;
+    gap: var(--s-4);
+    align-content: start;
+    max-width: 36ch;
+  }
+
+  .site-footer__logo {
+    text-decoration: none;
+    margin-bottom: var(--s-2);
+  }
+
+  .site-footer__heading {
+    margin-bottom: var(--s-4);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted-on-dark);
+    font-variation-settings: 'wdth' 100;
+  }
+
+  .site-footer ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .site-footer a {
+    text-decoration: none;
+    transition: color var(--dur-1) ease;
+  }
+
+  .site-footer a:hover {
+    color: var(--red-on-dark);
+  }
+
+  .site-footer__contact li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .site-footer__contact a,
+  .site-footer__contact li.muted {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+  }
+
+  .site-footer__contact :global(svg) {
+    width: 18px;
+    height: 18px;
+    flex: none;
+  }
+
+  .site-footer__locations li {
+    display: grid;
+    gap: var(--s-1);
+  }
+
+  .site-footer__locations a {
+    font-size: 0.85rem;
+    text-decoration: underline;
+    text-decoration-color: var(--red);
+    text-underline-offset: 3px;
+  }
+
+  .site-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-3);
+    padding-block: var(--s-5);
+    border-top: 1px solid var(--line-on-dark);
+    font-size: 0.82rem;
+    color: var(--muted-on-dark);
+  }
+</style>

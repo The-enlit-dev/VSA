@@ -1,0 +1,21 @@
+---
+interface Props {
+  eyebrow: string
+  title: string
+  lead?: string
+  /** One or two decorative kanji shown faintly behind the heading. */
+  kanji?: string
+}
+
+const { eyebrow, title, lead, kanji } = Astro.props
+---
+
+<header class="page-hero">
+  <div class="container">
+    <p class="eyebrow">{eyebrow}</p>
+    <h1 class="display">{title}</h1>
+    {lead && <p class="lead">{lead}</p>}
+    <slot />
+  </div>
+  {kanji && <span class="page-hero__kanji jp" aria-hidden="true">{kanji}</span>}
+</header>

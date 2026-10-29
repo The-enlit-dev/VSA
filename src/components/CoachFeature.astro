@@ -1,0 +1,196 @@
+---
+import { Image } from 'astro:assets'
+import type { Coach } from '../data/coaches'
+import { REVIEW_MODE, isVisible } from '../lib/review'
+import ConfirmTag from './ConfirmTag.astro'
+import FactText from './FactText.astro'
+
+interface Props {
+  coach: Coach
+  index?: number
+  headingLevel?: 'h2' | 'h3'
+  /** Show the full biography (coaches page) or just the first paragraph. */
+  full?: boolean
+}
+
+const { coach, index = 0, headingLevel: H = 'h3', full = true } = Astro.props
+const initials = coach.name
+  .replace(/^Sensei\s+/i, '')
+  .split(/\s+/)
+  .map((p) => p[0])
+  .join('')
+  .slice(0, 2)
+const [honorific, ...rest] = coach.name.startsWith('Sensei ') ? ['Sensei', coach.name.slice(7)] : ['', coach.name]
+const credentials = coach.credentials.filter(isVisible)
+const bio = full ? coach.bio : coach.bio.slice(0, 1)
+---
+
+<article class:list={['coach', { 'coach--flip': index % 2 === 1 }]} id={coach.id}>
+  <div class="coach__media" data-reveal>
+    {
+      coach.photo ? (
+        <Image
+          src={coach.photo}
+          alt={coach.photoAlt ?? coach.name}
+          widths={[480, 800, 1100]}
+          sizes="(min-width: 900px) 40vw, 100vw"
+          class="coach__photo"
+        />
+      ) : (
+        <div class="coach__monogram" role="img" aria-label={`${coach.name} (photo not yet added)`}>
+          <span class="coach__initials" aria-hidden="true">{initials}</span>
+          {REVIEW_MODE && (
+            <span class="coach__photo-note">
+              Portrait to be supplied <ConfirmTag label="Photo" source="Use a photo from the Wix 'Our Coaches' page" />
+            </span>
+          )}
+        </div>
+      )
+    }
+    <span class="coach__index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+  </div>
+
+  <div class="coach__body" data-reveal style="--reveal-i: 1">
+    <FactText fact={coach.role} as="p" class="eyebrow coach__role" />
+    <H class="coach__name">
+      {honorific && <span class="coach__honorific">{honorific}</span>}
+      {rest.join(' ')}
+    </H>
+
+    {
+      credentials.length > 0 && (
+        <ul class="coach__credentials">
+          {credentials.map((c) => (
+            <FactText fact={c} as="li" />
+          ))}
+        </ul>
+      )
+    }
+
+    <div class="coach__bio">
+      {bio.map((p) => <FactText fact={p} as="p" />)}
+    </div>
+    <slot />
+  </div>
+</article>
+
+<style>
+  .coach {
+    display: grid;
+    gap: clamp(var(--s-6), 5vw, var(--s-9));
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .coach {
+      grid-template-columns: 5fr 7fr;
+    }
+
+    .coach--flip .coach__media {
+      order: 2;
+    }
+  }
+
+  .coach__media {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    background: var(--ink-3);
+  }
+
+  .on-light .coach__media {
+    background: var(--ink);
+  }
+
+  .coach__photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(0.15) contrast(1.05);
+  }
+
+  .coach__monogram {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background:
+      repeating-linear-gradient(135deg, transparent 0 22px, rgb(255 255 255 / 0.025) 22px 23px),
+      var(--ink-2);
+    color: var(--text-on-dark);
+  }
+
+  .coach__monogram::before {
+    content: '';
+    position: absolute;
+    width: 46%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--red);
+    opacity: 0.92;
+  }
+
+  .coach__initials {
+    position: relative;
+    font-size: clamp(4rem, 10vw, 7.5rem);
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    font-variation-settings: 'wdth' 125;
+  }
+
+  .coach__photo-note {
+    position: absolute;
+    left: var(--s-4);
+    bottom: var(--s-4);
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    font-size: 0.8rem;
+    color: var(--muted-on-dark);
+  }
+
+  .coach__index {
+    position: absolute;
+    top: var(--s-4);
+    right: var(--s-4);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: rgb(255 255 255 / 0.7);
+  }
+
+  .coach__name {
+    margin-top: var(--s-5);
+    font-size: var(--step-5);
+    text-transform: uppercase;
+    line-height: 0.9;
+    font-variation-settings: 'wdth' 118;
+  }
+
+  .coach__honorific {
+    display: block;
+    margin-bottom: 0.25em;
+    font-size: 0.32em;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: var(--accent-text);
+  }
+
+  .coach__credentials {
+    display: grid;
+    gap: var(--s-2);
+    margin: var(--s-6) 0 0;
+    padding: var(--s-5) 0 0;
+    border-top: 1px solid var(--line);
+    list-style: none;
+    font-weight: 600;
+  }
+
+  .coach__bio {
+    display: grid;
+    gap: var(--s-4);
+    margin-top: var(--s-5);
+    max-width: var(--measure);
+    color: var(--muted);
+  }
+</style>

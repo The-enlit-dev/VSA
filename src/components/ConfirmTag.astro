@@ -1,0 +1,25 @@
+---
+/**
+ * Small "To confirm" marker for details that still need the academy's
+ * confirmation. Renders nothing outside review mode.
+ */
+import { REVIEW_MODE } from '../lib/review'
+
+interface Props {
+  source?: string
+  label?: string
+}
+
+const { source, label = 'To confirm' } = Astro.props
+const title = source ? `Awaiting confirmation. Source: ${source}` : 'Awaiting confirmation from the academy'
+---
+
+{
+  REVIEW_MODE && (
+    <span class="confirm-tag" title={title}>
+      <span class="visually-hidden">(</span>
+      {label}
+      <span class="visually-hidden">: {title})</span>
+    </span>
+  )
+}

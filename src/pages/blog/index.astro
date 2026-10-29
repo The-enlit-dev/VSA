@@ -1,0 +1,118 @@
+---
+import { getCollection } from 'astro:content'
+import { Image } from 'astro:assets'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import PageHero from '../../components/PageHero.astro'
+import CtaBand from '../../components/CtaBand.astro'
+import Icon from '../../components/Icon.astro'
+import { academy } from '../../data/site'
+
+const posts = (await getCollection('blog'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+
+const fmt = new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
+---
+
+<BaseLayout title="Blog" description={`News, results and notes from ${academy.name}.`}>
+  <PageHero eyebrow="Blog" title="News & notes" lead="Updates, results and stories from the academy." kanji="記" />
+
+  <section class="section" aria-label="Posts">
+    <div class="container">
+      {
+        posts.length > 0 ? (
+          <ul class="posts" role="list">
+            {posts.map((post, i) => (
+              <li class="post" data-reveal style={`--reveal-i: ${i % 3}`}>
+                <a href={`/blog/${post.id}/`} class="post__link">
+                  {post.data.cover && (
+                    <Image
+                      src={post.data.cover}
+                      alt={post.data.coverAlt ?? ''}
+                      widths={[480, 800]}
+                      sizes="(min-width: 900px) 33vw, 100vw"
+                      class="post__cover"
+                    />
+                  )}
+                  <time class="post__date" datetime={post.data.date.toISOString().slice(0, 10)}>
+                    {fmt.format(post.data.date)}
+                  </time>
+                  <h2 class="post__title">{post.data.title}</h2>
+                  <p class="muted">{post.data.description}</p>
+                  <span class="text-link" aria-hidden="true">
+                    Read <Icon name="arrow" />
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div class="empty">
+            <h2 class="h3">No posts yet</h2>
+            <p class="muted">News, results and stories from the academy will be published here.</p>
+            <a href="/events/" class="text-link">
+              See tournaments & belt exams <Icon name="arrow" />
+            </a>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .posts {
+    display: grid;
+    gap: var(--s-6) var(--s-5);
+    margin: 0;
+    padding: 0;
+  }
+
+  @media (min-width: 760px) {
+    .posts {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .posts {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .post__link {
+    display: grid;
+    gap: var(--s-3);
+    justify-items: start;
+    height: 100%;
+    padding-top: var(--s-5);
+    border-top: 2px solid var(--line);
+    text-decoration: none;
+    transition: border-color var(--dur-2) ease;
+  }
+
+  .post__link:hover {
+    border-top-color: var(--red);
+  }
+
+  .post__cover {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    margin-bottom: var(--s-2);
+  }
+
+  .post__date {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--red-on-dark);
+  }
+
+  .post__title {
+    font-size: var(--step-2);
+  }
+</style>

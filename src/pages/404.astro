@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import PageHero from '../components/PageHero.astro'
+import Icon from '../components/Icon.astro'
+import { nav, registerHref } from '../data/site'
+---
+
+<BaseLayout title="Page not found" description="The page you were looking for could not be found." noindex>
+  <PageHero
+    eyebrow="Error 404"
+    title="Off the mat"
+    lead="We couldn’t find that page. It may have moved when the site was rebuilt. Try one of these instead:"
+    kanji="迷"
+  >
+    <ul class="not-found__links" role="list">
+      <li><a href="/" class="btn btn-primary">Home <Icon name="arrow" class="icon-arrow" /></a></li>
+      <li><a href={registerHref} class="btn btn-secondary">Register / Enquire</a></li>
+      {nav.map((item) => <li><a href={item.href} class="btn btn-secondary">{item.label}</a></li>)}
+    </ul>
+  </PageHero>
+</BaseLayout>
+
+<style>
+  .not-found__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin: var(--s-6) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

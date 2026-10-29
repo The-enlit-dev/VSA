@@ -1,0 +1,63 @@
+---
+/**
+ * Temporary typographic wordmark. Replace the <svg> with the academy's
+ * official logo once it is supplied (see CONTENT-CHECKLIST.md).
+ */
+interface Props {
+  class?: string
+}
+const { class: className } = Astro.props
+---
+
+<span class:list={['logo', className]}>
+  <svg class="logo__mark" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true">
+    <rect x="1" y="1" width="38" height="38" fill="none" stroke="currentColor" stroke-opacity="0.35" stroke-width="1.5"></rect>
+    <circle cx="20" cy="20" r="9.5" fill="#c8102e"></circle>
+  </svg>
+  <span class="logo__text">
+    <span class="logo__abbr">VSA</span>
+    <span class="logo__name">Vishwa Sports Academy</span>
+  </span>
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .logo__mark {
+    width: 40px;
+    height: 40px;
+    flex: none;
+  }
+
+  .logo__text {
+    display: grid;
+    line-height: 1;
+  }
+
+  .logo__abbr {
+    font-size: 1.3rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    font-variation-settings: 'wdth' 125;
+  }
+
+  .logo__name {
+    margin-top: 0.3rem;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    opacity: 0.7;
+  }
+
+  @media (max-width: 359px) {
+    .logo__name {
+      display: none;
+    }
+  }
+</style>

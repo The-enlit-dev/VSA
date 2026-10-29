@@ -1,0 +1,329 @@
+---
+import { Image } from 'astro:assets'
+import { heroPhoto } from '../data/media'
+import { registerHref } from '../data/site'
+import Icon from './Icon.astro'
+
+const highlights = [
+  { k: '01', t: 'Led by Sensei Preetam Ichake', d: 'President of the academy' },
+  { k: '02', t: 'Graded belt examinations', d: 'A clear path from first class to next belt' },
+  { k: '03', t: 'Tournament opportunities', d: 'Announced on the events page' },
+]
+---
+
+<section class:list={['hero', { 'hero--photo': heroPhoto }]} aria-labelledby="hero-title">
+  {
+    heroPhoto && (
+      <div class="hero__photo">
+        <Image src={heroPhoto.src} alt={heroPhoto.alt} widths={[800, 1400, 2000, 2400]} sizes="100vw" loading="eager" fetchpriority="high" />
+      </div>
+    )
+  }
+
+  <div class="container hero__grid">
+    <div class="hero__copy">
+      <p class="eyebrow hero__eyebrow">Vishwa Sports Academy · Karate</p>
+      <h1 class="display hero__title" id="hero-title">
+        <span class="hero__line">Built on</span>
+        <span class="hero__line">discipline.</span>
+        <span class="hero__line hero__line--accent">Earned on</span>
+        <span class="hero__line hero__line--accent">the mat.</span>
+      </h1>
+      <p class="lead hero__lead">
+        Vishwa Sports Academy teaches karate under the guidance of Sensei Preetam Ichake — with regular training, graded
+        belt examinations and the chance to test yourself in tournaments.
+      </p>
+      <div class="btn-row hero__actions">
+        <a href={registerHref} class="btn btn-primary">Enquire about classes <Icon name="arrow" class="icon-arrow" /></a>
+        <a href="/coaches/" class="btn btn-secondary">Meet our coaches</a>
+      </div>
+    </div>
+
+    <figure class="hero__mark" aria-hidden="true">
+      <svg viewBox="0 0 240 720" class="hero__kanji" focusable="false">
+        <circle class="hero__sun" cx="120" cy="368" r="96"></circle>
+        <text class="hero__glyph" x="120" y="190" style="--d: 0s">空</text>
+        <text class="hero__glyph" x="120" y="420" style="--d: 0.35s">手</text>
+        <text class="hero__glyph" x="120" y="650" style="--d: 0.7s">道</text>
+      </svg>
+    </figure>
+  </div>
+
+  <div class="container">
+    <ul class="hero__highlights">
+      {
+        highlights.map((h, i) => (
+          <li style={`--i: ${i}`}>
+            <span class="hero__hk">{h.k}</span>
+            <span>
+              <strong>{h.t}</strong>
+              <span class="hero__hd">{h.d}</span>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+  <p class="hero__caption container"><span class="jp">空手道</span> Karate-dō · the way of the empty hand</p>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: min(100svh, 980px);
+    display: grid;
+    grid-template-rows: 1fr auto auto;
+    padding-top: calc(var(--header-h) + clamp(2.5rem, 6vw, 5rem));
+    padding-bottom: var(--s-6);
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 60% 55% at 78% 45%, rgb(200 16 46 / 0.1), transparent 70%),
+      var(--ink);
+    isolation: isolate;
+  }
+
+  /* Fine vertical rules: a quiet nod to the lines of a dojo floor. */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: repeating-linear-gradient(90deg, transparent 0 calc(100% / 12 - 1px), rgb(255 255 255 / 0.035) calc(100% / 12 - 1px) calc(100% / 12));
+    mask-image: linear-gradient(to bottom, black 40%, transparent);
+  }
+
+  .hero__photo {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+
+  .hero__photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(0.4) contrast(1.05) brightness(0.55);
+  }
+
+  .hero--photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, rgb(12 12 13 / 0.92) 0%, rgb(12 12 13 / 0.55) 55%, rgb(12 12 13 / 0.2));
+  }
+
+  .hero__grid {
+    display: grid;
+    align-items: center;
+    gap: var(--s-6);
+  }
+
+  @media (min-width: 960px) {
+    .hero__grid {
+      grid-template-columns: 1fr 260px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .hero__grid {
+      grid-template-columns: 1fr 320px;
+    }
+  }
+
+  .hero__title {
+    margin-top: var(--s-5);
+    font-size: clamp(2.4rem, 1rem + 7vw, 7.4rem);
+  }
+
+  .hero__line {
+    display: block;
+  }
+
+  .hero__line--accent {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--text-on-dark);
+  }
+
+  @supports not (-webkit-text-stroke: 1px black) {
+    .hero__line--accent {
+      color: var(--red-on-dark);
+    }
+  }
+
+  .hero__lead {
+    margin-top: var(--s-6);
+    color: var(--muted-on-dark);
+  }
+
+  .hero__actions {
+    margin-top: var(--s-6);
+  }
+
+  .hero__mark {
+    display: none;
+    margin: 0;
+  }
+
+  @media (min-width: 960px) {
+    .hero__mark {
+      display: block;
+    }
+  }
+
+  .hero__kanji {
+    width: 100%;
+    height: auto;
+    max-height: 68svh;
+    overflow: visible;
+  }
+
+  .hero__glyph {
+    font-family: var(--font-jp);
+    font-weight: 700;
+    font-size: 210px;
+    text-anchor: middle;
+    fill: rgb(243 240 234 / 0.06);
+    stroke: rgb(243 240 234 / 0.75);
+    stroke-width: 1.2;
+    stroke-dasharray: 1600;
+    stroke-dashoffset: 0;
+  }
+
+  .hero__sun {
+    fill: var(--red);
+    transform-origin: 120px 368px;
+  }
+
+  .hero__highlights {
+    display: grid;
+    gap: var(--s-4);
+    margin: clamp(var(--s-7), 6vw, var(--s-9)) 0 0;
+    padding: var(--s-5) 0 0;
+    border-top: 1px solid var(--line-on-dark);
+    list-style: none;
+  }
+
+  @media (min-width: 760px) {
+    .hero__highlights {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--s-6);
+    }
+  }
+
+  .hero__highlights li {
+    display: flex;
+    gap: var(--s-4);
+    align-items: baseline;
+  }
+
+  .hero__hk {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--red-on-dark);
+  }
+
+  .hero__highlights strong {
+    display: block;
+    font-weight: 700;
+  }
+
+  .hero__hd {
+    display: block;
+    font-size: 0.88rem;
+    color: var(--muted-on-dark);
+  }
+
+  .hero__caption {
+    margin-top: var(--s-5);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted-on-dark);
+  }
+
+  .hero__caption .jp {
+    margin-right: var(--s-2);
+    letter-spacing: 0.3em;
+  }
+
+  /* Entrance: headline lines rise in, kanji strokes draw, the sun settles. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__line,
+    .hero__lead,
+    .hero__actions,
+    .hero__eyebrow {
+      animation: hero-rise 1s var(--ease-out) both;
+    }
+
+    .hero__eyebrow {
+      animation-delay: 0.05s;
+    }
+
+    .hero__line:nth-child(1) {
+      animation-delay: 0.12s;
+    }
+
+    .hero__line:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .hero__line:nth-child(3) {
+      animation-delay: 0.28s;
+    }
+
+    .hero__line:nth-child(4) {
+      animation-delay: 0.36s;
+    }
+
+    .hero__lead {
+      animation-delay: 0.5s;
+    }
+
+    .hero__actions {
+      animation-delay: 0.6s;
+    }
+
+    .hero__glyph {
+      animation:
+        hero-draw 2.6s cubic-bezier(0.65, 0, 0.35, 1) var(--d) both,
+        hero-fill 1.4s ease calc(var(--d) + 1.6s) both;
+    }
+
+    .hero__sun {
+      animation: hero-sun 1.6s var(--ease-out) 0.4s both;
+    }
+
+    .hero__highlights li {
+      animation: hero-rise 0.9s var(--ease-out) both;
+      animation-delay: calc(0.8s + var(--i) * 0.1s);
+    }
+  }
+
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+  }
+
+  @keyframes hero-draw {
+    from {
+      stroke-dashoffset: 1600;
+    }
+  }
+
+  @keyframes hero-fill {
+    from {
+      fill: rgb(243 240 234 / 0);
+    }
+  }
+
+  @keyframes hero-sun {
+    from {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+  }
+</style>

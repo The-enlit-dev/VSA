@@ -1,0 +1,183 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import PageHero from '../../components/PageHero.astro'
+import EnquiryForm from '../../components/EnquiryForm.astro'
+import ConfirmTag from '../../components/ConfirmTag.astro'
+import Icon from '../../components/Icon.astro'
+import { academy, contact } from '../../data/site'
+import { email, phone, whatsappHref } from '../../lib/contact'
+import { REVIEW_MODE, needsTag } from '../../lib/review'
+
+const wa = whatsappHref()
+const steps = [
+  { t: 'Send your enquiry', d: 'Tell us who wants to train and how to reach you. It takes about two minutes.' },
+  { t: 'The academy replies', d: 'You’ll hear back with current batch timings, fees and where to train.' },
+  { t: 'Start training', d: 'Join a class and begin working towards your first belt examination.' },
+]
+---
+
+<BaseLayout
+  title="Register / Enquire"
+  description={`Enquire about karate classes at ${academy.name}. Send a short form and the academy will reply with batch timings, fees and how to get started.`}
+>
+  <PageHero
+    eyebrow="Register / Enquire"
+    title="Start your karate journey"
+    lead="Send a few details about who wants to train, and the academy will get back to you with everything you need to begin."
+    kanji="道"
+  />
+
+  <section class="section on-light" aria-labelledby="form-title">
+    <div class="container register">
+      <aside class="register__aside" aria-label="How registration works">
+        <h2 class="h3">How it works</h2>
+        <ol class="register__steps" role="list">
+          {
+            steps.map((s, i) => (
+              <li>
+                <span class="register__n">{String(i + 1).padStart(2, '0')}</span>
+                <div>
+                  <strong>{s.t}</strong>
+                  <p class="muted">{s.d}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+
+        {
+          (wa || phone || email || REVIEW_MODE) && (
+            <div class="register__direct">
+              <h2 class="h3">Prefer to talk?</h2>
+              <ul role="list">
+                {wa ? (
+                  <li>
+                    <a href={wa} class="btn btn-secondary btn-whatsapp" target="_blank" rel="noopener noreferrer">
+                      <Icon name="whatsapp" /> WhatsApp the academy<span class="visually-hidden"> (opens WhatsApp)</span>
+                    </a>
+                  </li>
+                ) : (
+                  REVIEW_MODE && (
+                    <li class="muted">
+                      WhatsApp enquiries <ConfirmTag label="Number to add" source={contact.whatsapp.source} />
+                    </li>
+                  )
+                )}
+                {phone ? (
+                  <li>
+                    <a href={phone.href} class="register__contact"><Icon name="phone" /> {phone.display}</a>
+                    {needsTag(contact.phone) && <ConfirmTag source={contact.phone.source} />}
+                  </li>
+                ) : (
+                  REVIEW_MODE && (
+                    <li class="muted">
+                      Phone <ConfirmTag label="Number to add" source={contact.phone.source} />
+                    </li>
+                  )
+                )}
+                {email ? (
+                  <li>
+                    <a href={email.href} class="register__contact"><Icon name="mail" /> {email.display}</a>
+                    {needsTag(contact.email) && <ConfirmTag source={contact.email.source} />}
+                  </li>
+                ) : (
+                  REVIEW_MODE && (
+                    <li class="muted">
+                      Email <ConfirmTag label="Conflict" source={contact.emailNote} />
+                    </li>
+                  )
+                )}
+              </ul>
+            </div>
+          )
+        }
+      </aside>
+
+      <div class="register__form">
+        <h2 class="h2" id="form-title">Enquiry form</h2>
+        <EnquiryForm />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .register {
+    display: grid;
+    gap: var(--s-8);
+  }
+
+  @media (min-width: 1000px) {
+    .register {
+      grid-template-columns: 0.75fr 1.25fr;
+      gap: var(--s-9);
+      align-items: start;
+    }
+
+    .register__aside {
+      position: sticky;
+      top: calc(var(--header-h) + var(--s-6));
+    }
+  }
+
+  .register__form {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .register__aside {
+    display: grid;
+    gap: var(--s-7);
+  }
+
+  .register__steps {
+    display: grid;
+    gap: var(--s-5);
+    margin: var(--s-5) 0 0;
+    padding: 0;
+  }
+
+  .register__steps li {
+    display: flex;
+    gap: var(--s-4);
+  }
+
+  .register__steps p {
+    margin-top: var(--s-1);
+    font-size: 0.95rem;
+  }
+
+  .register__n {
+    font-weight: 850;
+    color: var(--red);
+    font-variation-settings: 'wdth' 120;
+  }
+
+  .register__direct ul {
+    display: grid;
+    gap: var(--s-3);
+    margin: var(--s-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .register__direct li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .register__contact {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .register__contact :global(svg) {
+    width: 18px;
+    height: 18px;
+  }
+</style>

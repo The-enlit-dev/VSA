@@ -1,0 +1,27 @@
+---
+interface Props {
+  eyebrow: string
+  title: string
+  /** Renders the title as h1 instead of h2. */
+  level?: 1 | 2
+  split?: boolean
+  id?: string
+}
+
+const { eyebrow, title, level = 2, split = false, id } = Astro.props
+const Heading = level === 1 ? 'h1' : 'h2'
+---
+
+<div class:list={['section-head', { 'section-head--split': split }]} data-reveal>
+  <div>
+    <p class="eyebrow">{eyebrow}</p>
+    <Heading class="h2" id={id} style="margin-top: var(--s-5)">{title}</Heading>
+  </div>
+  {
+    Astro.slots.has('default') && (
+      <div class="section-head__aside">
+        <slot />
+      </div>
+    )
+  }
+</div>

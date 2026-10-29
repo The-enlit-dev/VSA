@@ -1,0 +1,25 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+  # Content review mode. While "true", details that still need the academy's
+  # confirmation are shown with a "To confirm" tag, placeholder photos are
+  # visible, and search engines are asked not to index the site.
+  # Set to "false" once CONTENT-CHECKLIST.md has been worked through.
+  PUBLIC_CONTENT_REVIEW = "true"
+
+# Hashed build assets never change, so they can be cached forever.
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"

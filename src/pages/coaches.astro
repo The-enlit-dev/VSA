@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import PageHero from '../components/PageHero.astro'
+import CoachFeature from '../components/CoachFeature.astro'
+import CtaBand from '../components/CtaBand.astro'
+import { academy } from '../data/site'
+import { coaches } from '../data/coaches'
+import { REVIEW_MODE, visible } from '../lib/review'
+
+const shown = visible(coaches)
+---
+
+<BaseLayout
+  title="Our Coaches"
+  description={`Meet the coaches of ${academy.name}, led by the academy's president, ${academy.president}.`}
+>
+  <PageHero
+    eyebrow="Our coaches"
+    title="The people on the mat"
+    lead={`Training at VSA is led by the academy’s president, ${academy.president}.`}
+    kanji="師"
+  />
+
+  <section class="section on-light" aria-label="Coach profiles">
+    <div class="container coach-list">
+      {shown.map((coach, i) => <CoachFeature coach={coach} index={i} headingLevel="h2" />)}
+      {
+        REVIEW_MODE && (
+          <div class="empty" data-reveal>
+            <h2 class="h3">More coaches</h2>
+            <p class="muted">
+              The current site’s “Our Coaches” page may list other instructors. Add each one to{' '}
+              <code>src/data/coaches.ts</code> with their photo, role and qualifications once confirmed.
+            </p>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <CtaBand title="Train with our coaches." />
+</BaseLayout>
+
+<style>
+  .coach-list {
+    display: grid;
+    gap: clamp(var(--s-8), 9vw, 9rem);
+  }
+
+  code {
+    font-size: 0.9em;
+  }
+</style>

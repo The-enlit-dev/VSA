@@ -1,0 +1,23 @@
+---
+/**
+ * Shown by Netlify after a successful submission when JavaScript is off
+ * (the form's action points here). With JavaScript on, the form shows its own
+ * success message instead.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import PageHero from '../../components/PageHero.astro'
+import Icon from '../../components/Icon.astro'
+---
+
+<BaseLayout title="Enquiry sent" description="Your enquiry has been sent to Vishwa Sports Academy." noindex>
+  <PageHero
+    eyebrow="Register / Enquire"
+    title="Thank you"
+    lead="Your enquiry has been sent. The academy will get back to you using the contact details you provided."
+  >
+    <div class="btn-row" style="margin-top: var(--s-6)">
+      <a href="/" class="btn btn-primary">Back to home <Icon name="arrow" class="icon-arrow" /></a>
+      <a href="/events/" class="btn btn-secondary">See upcoming events</a>
+    </div>
+  </PageHero>
+</BaseLayout>

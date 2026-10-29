@@ -1,0 +1,27 @@
+---
+/**
+ * Renders a Fact's text. Unconfirmed facts get a "To confirm" tag in review
+ * mode and are left out entirely otherwise.
+ */
+import type { Fact } from '../lib/review'
+import { isVisible, needsTag } from '../lib/review'
+import ConfirmTag from './ConfirmTag.astro'
+
+interface Props {
+  fact: Fact
+  as?: 'span' | 'p' | 'li' | 'dd'
+  class?: string
+}
+
+const { fact, as: Tag = 'span', class: className } = Astro.props
+const show = isVisible(fact) && fact.text.trim() !== ''
+---
+
+{
+  show && (
+    <Tag class:list={[className, { pending: needsTag(fact) && Tag === 'p' }]}>
+      {fact.text}
+      {needsTag(fact) && <ConfirmTag source={fact.source} />}
+    </Tag>
+  )
+}

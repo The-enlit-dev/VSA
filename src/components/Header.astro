@@ -1,0 +1,308 @@
+---
+import { nav, registerHref } from '../data/site'
+import Logo from './Logo.astro'
+import Icon from './Icon.astro'
+
+interface Props {
+  /** Path of the current page, used to mark the active nav link. */
+  current: string
+}
+
+const { current } = Astro.props
+const isActive = (href: string) => current === href || (href !== '/' && current.startsWith(href))
+---
+
+<header class="site-header" data-header>
+  <div class="container site-header__inner">
+    <a href="/" class="site-header__brand">
+      <Logo />
+    </a>
+
+    <nav class="site-nav" aria-label="Main">
+      <ul class="site-nav__list">
+        {
+          nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class="site-nav__link"
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                title={'title' in item ? item.title : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <a href={registerHref} class="btn btn-primary site-header__cta" aria-current={isActive(registerHref) ? 'page' : undefined}>
+      Register / Enquire
+    </a>
+
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      data-menu-toggle
+    >
+      <span class="menu-toggle__label" data-menu-label>Menu</span>
+      <Icon name="menu" class="menu-toggle__open" />
+      <Icon name="close" class="menu-toggle__close" />
+    </button>
+  </div>
+
+  <div class="mobile-menu" id="mobile-menu" data-mobile-menu hidden>
+    <nav class="container" aria-label="Mobile">
+      <ul class="mobile-menu__list">
+        <li><a href="/" aria-current={current === '/' ? 'page' : undefined}>Home</a></li>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+                {'title' in item ? item.title : item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <a href={registerHref} class="btn btn-primary mobile-menu__cta">
+        Register / Enquire <Icon name="arrow" class="icon-arrow" />
+      </a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  /* Sticky + negative margin: the header overlays the hero, and any review
+     banner above it scrolls away normally. */
+  .site-header {
+    position: sticky;
+    top: 0;
+    margin-bottom: calc(-1 * var(--header-h));
+    z-index: 50;
+    color: var(--text-on-dark);
+    transition:
+      background-color var(--dur-2) ease,
+      border-color var(--dur-2) ease,
+      transform var(--dur-2) var(--ease-out);
+    border-bottom: 1px solid transparent;
+  }
+
+  .site-header.is-scrolled,
+  .site-header.is-open {
+    background: rgb(12 12 13 / 0.94);
+    border-bottom-color: var(--line-on-dark);
+  }
+
+  @supports (backdrop-filter: blur(1px)) {
+    .site-header.is-scrolled:not(.is-open) {
+      background: rgb(12 12 13 / 0.82);
+      backdrop-filter: blur(12px) saturate(1.2);
+    }
+  }
+
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+    height: var(--header-h);
+  }
+
+  .site-header__brand {
+    text-decoration: none;
+    margin-right: auto;
+  }
+
+  .site-nav {
+    display: none;
+  }
+
+  .site-nav__list {
+    display: flex;
+    gap: clamp(1rem, 2vw, 2.25rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-nav__link {
+    position: relative;
+    display: inline-block;
+    padding-block: var(--s-2);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--muted-on-dark);
+    transition: color var(--dur-1) ease;
+  }
+
+  .site-nav__link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-2) var(--ease-out);
+  }
+
+  .site-nav__link:hover,
+  .site-nav__link[aria-current='page'] {
+    color: var(--text-on-dark);
+  }
+
+  .site-nav__link:hover::after,
+  .site-nav__link[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+
+  .site-header__cta {
+    display: none;
+    min-height: 44px;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: 44px;
+    padding: 0 var(--s-3);
+    border: 1px solid var(--line-on-dark);
+    border-radius: var(--radius);
+    background: transparent;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .menu-toggle :global(svg) {
+    width: 20px;
+    height: 20px;
+  }
+
+  .menu-toggle :global(.menu-toggle__close),
+  .menu-toggle[aria-expanded='true'] :global(.menu-toggle__open) {
+    display: none;
+  }
+
+  .menu-toggle[aria-expanded='true'] :global(.menu-toggle__close) {
+    display: block;
+  }
+
+  .mobile-menu {
+    height: calc(100dvh - var(--header-h));
+    overflow-y: auto;
+    background: var(--ink);
+    border-top: 1px solid var(--line-on-dark);
+  }
+
+  .mobile-menu nav {
+    padding-block: var(--s-6) var(--s-7);
+  }
+
+  .mobile-menu__list {
+    margin: 0 0 var(--s-6);
+    padding: 0;
+    list-style: none;
+  }
+
+  .mobile-menu__list a {
+    display: block;
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--line-on-dark);
+    font-size: var(--step-3);
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-variation-settings: 'wdth' 115;
+  }
+
+  .mobile-menu__list a[aria-current='page'] {
+    color: var(--red-on-dark);
+  }
+
+  .mobile-menu__cta {
+    width: 100%;
+  }
+
+  @media (min-width: 1040px) {
+    .site-nav,
+    .site-header__cta {
+      display: block;
+    }
+
+    .site-header__cta {
+      display: inline-flex;
+    }
+
+    .menu-toggle,
+    .mobile-menu {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]')
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]')
+  const menu = document.querySelector<HTMLElement>('[data-mobile-menu]')
+  const label = document.querySelector<HTMLElement>('[data-menu-label]')
+
+  if (header && toggle && menu) {
+    const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 24)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+
+    const setOpen = (open: boolean, { restoreFocus = true } = {}) => {
+      toggle.setAttribute('aria-expanded', String(open))
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu')
+      if (label) label.textContent = open ? 'Close' : 'Menu'
+      menu.hidden = !open
+      header.classList.toggle('is-open', open)
+      document.documentElement.style.overflow = open ? 'hidden' : ''
+      if (open) {
+        // Bring the header to the top of the viewport so the menu fits.
+        if (header.getBoundingClientRect().top > 0) window.scrollTo({ top: header.offsetTop, behavior: 'instant' })
+        menu.querySelector<HTMLElement>('a')?.focus()
+      }
+      else if (restoreFocus) toggle.focus()
+    }
+
+    toggle.setAttribute('aria-label', 'Open menu')
+    toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'))
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !menu.hidden) setOpen(false)
+    })
+
+    // Keep focus inside the open menu (toggle button + menu links).
+    header.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab' || menu.hidden) return
+      const items = [toggle, ...menu.querySelectorAll<HTMLElement>('a')]
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    })
+
+    // Close if the viewport grows to desktop width while open.
+    window.matchMedia('(min-width: 1040px)').addEventListener('change', (e) => {
+      if (e.matches && !menu.hidden) setOpen(false, { restoreFocus: false })
+    })
+  }
+</script>

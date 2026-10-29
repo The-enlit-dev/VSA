@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import PageHero from '../components/PageHero.astro'
+import Gallery from '../components/Gallery.astro'
+import CtaBand from '../components/CtaBand.astro'
+import { academy } from '../data/site'
+import { photos } from '../data/gallery'
+import { REVIEW_MODE, visible } from '../lib/review'
+
+const shown = visible(photos)
+const placeholdersOnly = shown.length > 0 && shown.every((p) => p.placeholder)
+---
+
+<BaseLayout
+  title="Gallery"
+  description={`Photos from training sessions, belt examinations, tournaments and academy life at ${academy.name}.`}
+>
+  <PageHero
+    eyebrow="Gallery"
+    title="Training, gradings & competition"
+    lead="Moments from classes, belt examinations, tournaments and life at the academy."
+    kanji="写"
+  />
+
+  <section class="section" aria-label="Photos">
+    <div class="container">
+      {
+        REVIEW_MODE && placeholdersOnly && (
+          <p class="gallery-note">
+            <span class="confirm-tag">Placeholders</span> These tiles show the layout and photo viewer. Replace them with
+            the academy’s own photos (see <code>src/data/gallery.ts</code>).
+          </p>
+        )
+      }
+      {
+        shown.length > 0 ? (
+          <Gallery photos={shown} filters />
+        ) : (
+          <div class="empty">
+            <h2 class="h3">Photos coming soon</h2>
+            <p class="muted">Photos from training, belt exams and tournaments will appear here.</p>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .gallery-note {
+    margin-bottom: var(--s-6);
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  .gallery-note .confirm-tag {
+    margin: 0 var(--s-2) 0 0;
+  }
+</style>

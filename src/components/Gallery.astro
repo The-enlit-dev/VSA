@@ -1,0 +1,479 @@
+---
+import { Image, getImage } from 'astro:assets'
+import { categories, type Category, type Photo } from '../data/gallery'
+import { REVIEW_MODE } from '../lib/review'
+import Icon from './Icon.astro'
+
+interface Props {
+  photos: Photo[]
+  /** Show category filter buttons. */
+  filters?: boolean
+  /** Unique prefix when more than one gallery is on a page. */
+  id?: string
+  /** Equal-sized tiles (used for short previews, where spans would leave gaps). */
+  uniform?: boolean
+}
+
+const { photos, filters = false, id = 'gallery', uniform = false } = Astro.props
+
+const items = await Promise.all(
+  photos.map(async (photo, i) => {
+    const full = await getImage({ src: photo.src, width: Math.min(photo.src.width, 2000), format: 'webp', quality: 80 })
+    const ratio = photo.src.width / photo.src.height
+    const shape = ratio < 0.85 ? 'tall' : ratio > 1.6 ? 'wide' : 'regular'
+    return { ...photo, i, full, shape }
+  }),
+)
+
+const usedCategories = (Object.keys(categories) as Category[]).filter((c) => photos.some((p) => p.category === c))
+---
+
+<div class="gallery" data-gallery id={id}>
+  {
+    filters && usedCategories.length > 1 && (
+      <div class="gallery__filters" role="group" aria-label="Filter photos">
+        <button type="button" class="gallery__filter" aria-pressed="true" data-filter="all">
+          All <span class="gallery__count">{photos.length}</span>
+        </button>
+        {usedCategories.map((c) => (
+          <button type="button" class="gallery__filter" aria-pressed="false" data-filter={c}>
+            {categories[c]} <span class="gallery__count">{photos.filter((p) => p.category === c).length}</span>
+          </button>
+        ))}
+      </div>
+    )
+  }
+
+  <ul class:list={['gallery__grid', { 'gallery__grid--uniform': uniform }]} role="list">
+    {
+      items.map((item) => (
+        <li class:list={['gallery__item', `gallery__item--${item.shape}`]} data-category={item.category} data-reveal style={`--reveal-i: ${item.i % 3}`}>
+          <button
+            type="button"
+            class="gallery__open"
+            data-full={item.full.src}
+            data-caption={item.caption ?? ''}
+            data-alt={item.alt}
+            aria-label={`View larger: ${item.alt}`}
+          >
+            <Image
+              src={item.src}
+              alt={item.alt}
+              widths={[480, 800, 1200]}
+              sizes="(min-width: 1100px) 33vw, (min-width: 640px) 50vw, 100vw"
+              loading="lazy"
+              decoding="async"
+            />
+            <span class="gallery__overlay" aria-hidden="true">
+              {item.caption && <span class="gallery__caption">{item.caption}</span>}
+              <Icon name="expand" />
+            </span>
+            {item.placeholder && REVIEW_MODE && <span class="gallery__placeholder-tag">Placeholder</span>}
+          </button>
+        </li>
+      ))
+    }
+  </ul>
+
+  <dialog class="lightbox" aria-label="Photo viewer" data-lightbox>
+    <div class="lightbox__inner">
+      <div class="lightbox__bar">
+        <p class="lightbox__counter" data-counter aria-live="polite"></p>
+        <button type="button" class="lightbox__btn" data-close aria-label="Close photo viewer">
+          <Icon name="close" />
+        </button>
+      </div>
+      <figure class="lightbox__figure">
+        <div class="lightbox__stage">
+          <p class="lightbox__state" data-loading>Loading photo…</p>
+          <p class="lightbox__state" data-error hidden>This photo couldn’t be loaded.</p>
+          <img data-image alt="" />
+        </div>
+        <figcaption class="lightbox__caption" data-caption></figcaption>
+      </figure>
+      <button type="button" class="lightbox__btn lightbox__nav lightbox__nav--prev" data-prev aria-label="Previous photo">
+        <Icon name="chevron-left" />
+      </button>
+      <button type="button" class="lightbox__btn lightbox__nav lightbox__nav--next" data-next aria-label="Next photo">
+        <Icon name="chevron-right" />
+      </button>
+    </div>
+  </dialog>
+</div>
+
+<style>
+  .gallery__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin-bottom: var(--s-6);
+  }
+
+  .gallery__filter {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: 44px;
+    padding: 0 var(--s-4);
+    border: 1px solid var(--line-on-dark);
+    border-radius: var(--radius);
+    background: transparent;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-1) ease,
+      border-color var(--dur-1) ease;
+  }
+
+  .gallery__filter:hover {
+    border-color: rgb(255 255 255 / 0.4);
+  }
+
+  .gallery__filter[aria-pressed='true'] {
+    background: var(--white);
+    border-color: var(--white);
+    color: var(--ink);
+  }
+
+  .gallery__count {
+    font-weight: 500;
+    opacity: 0.6;
+  }
+
+  .gallery__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-rows: 260px;
+    grid-auto-flow: dense;
+    gap: var(--s-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 640px) {
+    .gallery__grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: 240px;
+    }
+
+    .gallery__item--tall {
+      grid-row: span 2;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .gallery__grid {
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: 280px;
+    }
+
+    .gallery__item--wide {
+      grid-column: span 2;
+    }
+  }
+
+  .gallery__grid--uniform .gallery__item {
+    grid-row: auto !important;
+    grid-column: auto !important;
+  }
+
+  .gallery__open {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: var(--ink-3);
+    cursor: zoom-in;
+    overflow: hidden;
+  }
+
+  .gallery__open :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 900ms var(--ease-out);
+  }
+
+  .gallery__open:hover :global(img),
+  .gallery__open:focus-visible :global(img) {
+    transform: scale(1.04);
+  }
+
+  .gallery__overlay {
+    position: absolute;
+    inset: auto 0 0;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--s-3);
+    padding: var(--s-6) var(--s-4) var(--s-4);
+    background: linear-gradient(to top, rgb(0 0 0 / 0.7), transparent);
+    color: var(--white);
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity var(--dur-2) ease,
+      transform var(--dur-2) var(--ease-out);
+  }
+
+  .gallery__open:hover .gallery__overlay,
+  .gallery__open:focus-visible .gallery__overlay {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (hover: none) {
+    .gallery__overlay {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .gallery__caption {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .gallery__overlay :global(svg) {
+    width: 20px;
+    height: 20px;
+    flex: none;
+  }
+
+  .gallery__placeholder-tag {
+    position: absolute;
+    top: var(--s-3);
+    left: var(--s-3);
+    padding: 0.15em 0.55em;
+    border: 1px dashed var(--review);
+    background: rgb(12 12 13 / 0.8);
+    color: var(--review);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: rgb(8 8 9 / 0.97);
+    color: var(--text-on-dark);
+  }
+
+  .lightbox::backdrop {
+    background: rgb(0 0 0 / 0.6);
+  }
+
+  .lightbox[open] {
+    animation: lightbox-in var(--dur-2) var(--ease-out);
+  }
+
+  @keyframes lightbox-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .lightbox__inner {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100%;
+    padding: var(--s-3) var(--gutter) var(--s-5);
+  }
+
+  .lightbox__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .lightbox__counter {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--muted-on-dark);
+  }
+
+  .lightbox__figure {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: var(--s-3);
+    min-height: 0;
+    margin: 0;
+  }
+
+  .lightbox__stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 0;
+  }
+
+  .lightbox__stage img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    grid-area: 1 / 1;
+  }
+
+  .lightbox__state {
+    grid-area: 1 / 1;
+    color: var(--muted-on-dark);
+  }
+
+  .lightbox__caption {
+    min-height: 1.5em;
+    text-align: center;
+    color: var(--muted-on-dark);
+    font-size: 0.95rem;
+  }
+
+  .lightbox__btn {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 1px solid var(--line-on-dark);
+    border-radius: var(--radius);
+    background: rgb(12 12 13 / 0.6);
+    cursor: pointer;
+    transition: background-color var(--dur-1) ease;
+  }
+
+  .lightbox__btn:hover {
+    background: var(--ink-4);
+  }
+
+  .lightbox__btn :global(svg) {
+    width: 22px;
+    height: 22px;
+  }
+
+  .lightbox__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .lightbox__nav--prev {
+    left: var(--s-3);
+  }
+
+  .lightbox__nav--next {
+    right: var(--s-3);
+  }
+
+  @media (max-width: 640px) {
+    .lightbox__nav {
+      top: auto;
+      bottom: var(--s-4);
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((gallery) => {
+    const dialog = gallery.querySelector<HTMLDialogElement>('[data-lightbox]')!
+    const img = dialog.querySelector<HTMLImageElement>('[data-image]')!
+    const caption = dialog.querySelector<HTMLElement>('[data-caption]')!
+    const counter = dialog.querySelector<HTMLElement>('[data-counter]')!
+    const loading = dialog.querySelector<HTMLElement>('[data-loading]')!
+    const error = dialog.querySelector<HTMLElement>('[data-error]')!
+    const items = () =>
+      [...gallery.querySelectorAll<HTMLButtonElement>('.gallery__open')].filter((b) => !b.closest('li')!.hidden)
+
+    let index = 0
+    let opener: HTMLElement | null = null
+
+    function show(i: number) {
+      const list = items()
+      if (!list.length) return
+      index = (i + list.length) % list.length
+      const btn = list[index]
+      loading.hidden = false
+      error.hidden = true
+      img.hidden = true
+      img.src = btn.dataset.full!
+      img.alt = btn.dataset.alt ?? ''
+      caption.textContent = btn.dataset.caption ?? ''
+      counter.textContent = `${index + 1} / ${list.length}`
+      const single = list.length < 2
+      dialog.querySelectorAll<HTMLElement>('[data-prev], [data-next]').forEach((b) => (b.hidden = single))
+    }
+
+    img.addEventListener('load', () => {
+      loading.hidden = true
+      img.hidden = false
+    })
+    img.addEventListener('error', () => {
+      loading.hidden = true
+      error.hidden = false
+    })
+
+    gallery.querySelector('.gallery__grid')!.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.gallery__open')
+      if (!btn) return
+      opener = btn
+      dialog.showModal()
+      show(items().indexOf(btn))
+      dialog.querySelector<HTMLElement>('[data-close]')!.focus()
+    })
+
+    dialog.querySelector('[data-close]')!.addEventListener('click', () => dialog.close())
+    dialog.querySelector('[data-prev]')!.addEventListener('click', () => show(index - 1))
+    dialog.querySelector('[data-next]')!.addEventListener('click', () => show(index + 1))
+    dialog.addEventListener('close', () => {
+      img.removeAttribute('src')
+      opener?.focus()
+    })
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') show(index - 1)
+      if (e.key === 'ArrowRight') show(index + 1)
+    })
+    // Click on the dark area around the photo closes the viewer.
+    dialog.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement
+      if (t === dialog || t.classList.contains('lightbox__stage') || t.classList.contains('lightbox__inner')) dialog.close()
+    })
+
+    // Swipe left/right on touch screens.
+    let startX = 0
+    dialog.addEventListener('touchstart', (e) => (startX = e.touches[0].clientX), { passive: true })
+    dialog.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - startX
+      if (Math.abs(dx) > 50) show(dx > 0 ? index - 1 : index + 1)
+    })
+
+    // Category filters.
+    const filterButtons = gallery.querySelectorAll<HTMLButtonElement>('[data-filter]')
+    filterButtons.forEach((button) =>
+      button.addEventListener('click', () => {
+        const value = button.dataset.filter
+        filterButtons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)))
+        gallery.querySelectorAll<HTMLElement>('.gallery__item').forEach((li) => {
+          li.hidden = value !== 'all' && li.dataset.category !== value
+          li.classList.add('is-visible')
+        })
+      }),
+    )
+  })
+</script>

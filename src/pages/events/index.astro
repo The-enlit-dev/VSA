@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import PageHero from '../../components/PageHero.astro'
+import EventCard from '../../components/EventCard.astro'
+import CtaBand from '../../components/CtaBand.astro'
+import Icon from '../../components/Icon.astro'
+import { academy, registerHref } from '../../data/site'
+import { getEvents } from '../../lib/events'
+
+const { upcoming, past } = await getEvents()
+---
+
+<BaseLayout
+  title="Tournaments & Belt Exams"
+  description={`Upcoming tournaments, belt examinations and announcements from ${academy.name}, plus a record of past events.`}
+>
+  <PageHero
+    eyebrow="Next tournament / belt exam"
+    title="Tournaments & belt exams"
+    lead="Upcoming gradings, competitions and announcements from the academy — and a record of past events."
+    kanji="試合"
+  />
+
+  <section class="section" aria-labelledby="upcoming-title" data-events-page>
+    <div class="container">
+      <h2 class="events-heading" id="upcoming-title">Upcoming</h2>
+      <div class="event-list" data-upcoming-list>
+        {upcoming.map((e) => <EventCard event={e} status="upcoming" />)}
+      </div>
+      <div class="empty" data-upcoming-empty hidden={upcoming.length > 0}>
+        <h3>No upcoming events announced yet</h3>
+        <p class="muted">
+          Dates for the next belt examination or tournament will be posted here once confirmed. Current students will
+          also hear about them from their instructor.
+        </p>
+        <a href={registerHref} class="text-link">Ask the academy <Icon name="arrow" /></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section on-ink-2" aria-labelledby="past-title">
+    <div class="container">
+      <h2 class="events-heading" id="past-title">Past events</h2>
+      <div class="event-list" data-past-list>
+        {past.map((e) => <EventCard event={e} status="past" />)}
+      </div>
+      <div class="empty" data-past-empty hidden={past.length > 0}>
+        <h3>No past events listed yet</h3>
+        <p class="muted">Results and highlights from previous events will be added here.</p>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .events-heading {
+    margin-bottom: var(--s-5);
+    font-size: var(--step-3);
+    text-transform: uppercase;
+  }
+</style>
+
+<script>
+  // The page is built ahead of time. If an "upcoming" event has finished since
+  // the last build, move it to "Past" so visitors never see a stale listing.
+  const today = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD in local time
+  const upcomingList = document.querySelector<HTMLElement>('[data-upcoming-list]')
+  const pastList = document.querySelector<HTMLElement>('[data-past-list]')
+  if (upcomingList && pastList) {
+    upcomingList.querySelectorAll<HTMLElement>('[data-event]').forEach((card) => {
+      if ((card.dataset.end ?? '') < today) {
+        card.classList.replace('event-card--upcoming', 'event-card--past')
+        const status = card.querySelector('[data-event-status]')
+        if (status) status.textContent = 'Past event'
+        pastList.prepend(card)
+      }
+    })
+    document.querySelector<HTMLElement>('[data-upcoming-empty]')!.hidden = upcomingList.children.length > 0
+    document.querySelector<HTMLElement>('[data-past-empty]')!.hidden = pastList.children.length > 0
+  }
+</script>

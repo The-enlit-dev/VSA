@@ -1,0 +1,566 @@
+---
+/**
+ * Enquiry form, submitted through Netlify Forms (free tier).
+ *
+ * Netlify finds this form in the built HTML at deploy time because of
+ * data-netlify="true". Submissions appear in the Netlify dashboard under
+ * Forms → enquiry, and can be emailed to the academy (see README).
+ *
+ * The form only reports success when Netlify accepts the submission. Outside
+ * a Netlify build (local dev, `astro preview`) it says it cannot send and
+ * sends nothing. Field names here must stay stable: renaming one creates a
+ * new column in Netlify.
+ */
+import { phone, whatsappHref } from '../lib/contact'
+import Icon from './Icon.astro'
+
+const formsLive = process.env.NETLIFY === 'true' || process.env.FORMS_LIVE === 'true'
+const wa = whatsappHref()
+---
+
+<div class="enquiry" data-enquiry>
+  <form
+    name="enquiry"
+    method="POST"
+    action="/register/thanks/"
+    data-netlify="true"
+    netlify-honeypot="bot-field"
+    class="enquiry__form"
+    data-forms-live={formsLive ? 'true' : 'false'}
+    aria-describedby="enquiry-intro"
+  >
+    <input type="hidden" name="form-name" value="enquiry" />
+    <p class="visually-hidden">
+      <label>Leave this field empty <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+    </p>
+
+    <p id="enquiry-intro" class="enquiry__intro muted">
+      Fields marked <span aria-hidden="true">*</span><span class="visually-hidden">with an asterisk</span> are required.
+    </p>
+
+    <div class="enquiry__summary" role="alert" aria-live="assertive" data-error-summary hidden tabindex="-1"></div>
+
+    <fieldset class="field field--choice">
+      <legend>Who is the enquiry for? <span aria-hidden="true">*</span></legend>
+      <div class="choice-row">
+        <label class="choice"><input type="radio" name="enquiry_for" value="My child" checked /> <span>My child</span></label>
+        <label class="choice"><input type="radio" name="enquiry_for" value="Myself" /> <span>Myself</span></label>
+      </div>
+    </fieldset>
+
+    <div class="field-grid">
+      <div class="field">
+        <label for="student_name">Student’s name <span aria-hidden="true">*</span></label>
+        <input id="student_name" name="student_name" type="text" autocomplete="name" required maxlength="80" aria-describedby="student_name-error" />
+        <p class="field__error" id="student_name-error" data-error-for="student_name"></p>
+      </div>
+
+      <div class="field">
+        <label for="student_age">Student’s age <span class="field__optional">(optional)</span></label>
+        <input id="student_age" name="student_age" type="number" inputmode="numeric" min="3" max="99" aria-describedby="student_age-hint student_age-error" />
+        <p class="field__hint" id="student_age-hint">Helps the academy suggest a suitable batch.</p>
+        <p class="field__error" id="student_age-error" data-error-for="student_age"></p>
+      </div>
+
+      <div class="field" data-guardian>
+        <label for="guardian_name">Parent / guardian name <span aria-hidden="true" data-guardian-required>*</span></label>
+        <input id="guardian_name" name="guardian_name" type="text" autocomplete="name" maxlength="80" aria-describedby="guardian_name-error" />
+        <p class="field__error" id="guardian_name-error" data-error-for="guardian_name"></p>
+      </div>
+
+      <div class="field">
+        <label for="phone">Phone number <span aria-hidden="true">*</span></label>
+        <input id="phone" name="phone" type="tel" autocomplete="tel" required maxlength="20" aria-describedby="phone-hint phone-error" />
+        <p class="field__hint" id="phone-hint">The academy will use this to reply. Include the country code if outside India.</p>
+        <p class="field__error" id="phone-error" data-error-for="phone"></p>
+      </div>
+
+      <div class="field">
+        <label for="email">Email <span class="field__optional">(optional)</span></label>
+        <input id="email" name="email" type="email" autocomplete="email" maxlength="120" aria-describedby="email-error" />
+        <p class="field__error" id="email-error" data-error-for="email"></p>
+      </div>
+
+      <div class="field">
+        <label for="area">Preferred area or branch <span class="field__optional">(optional)</span></label>
+        <input id="area" name="area" type="text" maxlength="80" aria-describedby="area-hint" />
+        <p class="field__hint" id="area-hint">For example, the part of Pune you live in.</p>
+      </div>
+
+      <div class="field">
+        <label for="experience">Karate experience <span class="field__optional">(optional)</span></label>
+        <select id="experience" name="experience">
+          <option value="">Select…</option>
+          <option>Complete beginner</option>
+          <option>Trained before</option>
+          <option>Currently holds a belt</option>
+        </select>
+      </div>
+
+      <fieldset class="field field--choice">
+        <legend>Preferred way to be contacted <span class="field__optional">(optional)</span></legend>
+        <div class="choice-row">
+          <label class="choice"><input type="radio" name="contact_preference" value="Phone call" /> <span>Call</span></label>
+          <label class="choice"><input type="radio" name="contact_preference" value="WhatsApp" /> <span>WhatsApp</span></label>
+          <label class="choice"><input type="radio" name="contact_preference" value="Email" /> <span>Email</span></label>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="field">
+      <label for="message">Your message <span class="field__optional">(optional)</span></label>
+      <textarea id="message" name="message" rows="5" maxlength="1500" aria-describedby="message-hint"></textarea>
+      <p class="field__hint" id="message-hint">Questions about timings, fees, trial classes or anything else.</p>
+    </div>
+
+    <div class="field field--consent">
+      <label class="choice">
+        <input type="checkbox" name="consent" value="Yes" required aria-describedby="consent-error" />
+        <span>I agree to Vishwa Sports Academy contacting me about this enquiry. <span aria-hidden="true">*</span></span>
+      </label>
+      <p class="field__error" id="consent-error" data-error-for="consent"></p>
+    </div>
+
+    <div class="enquiry__actions">
+      <button type="submit" class="btn btn-primary" data-submit>
+        <span data-submit-label>Send enquiry</span>
+        <Icon name="arrow" class="icon-arrow" />
+      </button>
+      <p class="enquiry__privacy muted">
+        Your details are only used to reply to this enquiry. They are stored with the site’s form service (Netlify)
+        and shared with the academy.
+      </p>
+    </div>
+
+    <div class="enquiry__status" data-status role="alert" hidden></div>
+  </form>
+
+  <div class="enquiry__success" data-success hidden tabindex="-1">
+    <span class="enquiry__success-icon"><Icon name="check" /></span>
+    <h2 class="h3">Thank you — your enquiry has been sent.</h2>
+    <p>The academy will get back to you using the contact details you provided.</p>
+    {
+      wa && (
+        <p>
+          Prefer to chat now?{' '}
+          <a href={wa} target="_blank" rel="noopener noreferrer">
+            Message the academy on WhatsApp<span class="visually-hidden"> (opens WhatsApp)</span>
+          </a>
+          .
+        </p>
+      )
+    }
+    <div class="btn-row">
+      <a href="/" class="btn btn-secondary">Back to home</a>
+      <a href="/events/" class="btn btn-secondary">See upcoming events</a>
+    </div>
+  </div>
+
+  <template data-failure-template>
+    <strong>We couldn’t send your enquiry.</strong> Please check your connection and try again — nothing you typed has been lost.
+    {wa && <> You can also <a href={wa} target="_blank" rel="noopener noreferrer">message the academy on WhatsApp</a>.</>}
+    {phone && <> Or call <a href={phone.href}>{phone.display}</a>.</>}
+  </template>
+</div>
+
+<style>
+  .enquiry {
+    --field-bg: var(--white);
+    --field-border: rgb(19 19 21 / 0.28);
+  }
+
+  .enquiry__form {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .enquiry__intro {
+    font-size: 0.9rem;
+  }
+
+  .field-grid {
+    display: grid;
+    gap: var(--s-6) var(--s-5);
+  }
+
+  @media (min-width: 720px) {
+    .field-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .field {
+    display: grid;
+    gap: var(--s-2);
+    align-content: start;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .field > label,
+  .field legend {
+    padding: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .field legend {
+    margin-bottom: var(--s-2);
+  }
+
+  .field__optional {
+    font-weight: 400;
+    color: var(--muted-on-light);
+  }
+
+  .field input:not([type='radio'], [type='checkbox']),
+  .field select,
+  .field textarea {
+    width: 100%;
+    min-height: 50px;
+    padding: 0.7rem 0.9rem;
+    border: 1.5px solid var(--field-border);
+    border-radius: var(--radius);
+    background: var(--field-bg);
+    color: var(--text-on-light);
+    transition:
+      border-color var(--dur-1) ease,
+      box-shadow var(--dur-1) ease;
+  }
+
+  .field textarea {
+    resize: vertical;
+    min-height: 140px;
+  }
+
+  .field input:hover,
+  .field select:hover,
+  .field textarea:hover {
+    border-color: rgb(19 19 21 / 0.5);
+  }
+
+  .field input:focus-visible,
+  .field select:focus-visible,
+  .field textarea:focus-visible {
+    outline: none;
+    border-color: var(--ink);
+    box-shadow: 0 0 0 3px rgb(200 16 46 / 0.35);
+  }
+
+  .field [aria-invalid='true'] {
+    border-color: var(--red) !important;
+  }
+
+  .field__hint {
+    font-size: 0.82rem;
+    color: var(--muted-on-light);
+  }
+
+  .field__error {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #a50d26;
+  }
+
+  .field__error:empty {
+    display: none;
+  }
+
+  .choice-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+
+  .choice {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .field--choice .choice {
+    min-height: 46px;
+    padding: 0 var(--s-4);
+    border: 1.5px solid var(--field-border);
+    border-radius: var(--radius);
+    background: var(--field-bg);
+  }
+
+  .field--choice .choice:has(input:checked) {
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+
+  .field--choice .choice:has(input:focus-visible) {
+    outline: 2px solid var(--red);
+    outline-offset: 2px;
+  }
+
+  .choice input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--red);
+    flex: none;
+  }
+
+  .field--consent .choice {
+    align-items: flex-start;
+    line-height: 1.5;
+  }
+
+  .field--consent .choice input {
+    margin-top: 0.15rem;
+  }
+
+  .enquiry__actions {
+    display: grid;
+    gap: var(--s-4);
+    justify-items: start;
+  }
+
+  .enquiry__privacy {
+    font-size: 0.82rem;
+    max-width: 60ch;
+  }
+
+  .enquiry__summary,
+  .enquiry__status {
+    padding: var(--s-4) var(--s-5);
+    border-left: 3px solid var(--red);
+    background: rgb(200 16 46 / 0.07);
+    font-size: 0.95rem;
+  }
+
+  .enquiry__summary:focus {
+    outline: 2px solid var(--red);
+    outline-offset: 2px;
+  }
+
+  .enquiry__summary ul {
+    margin: var(--s-2) 0 0;
+    padding-left: 1.2em;
+  }
+
+  .enquiry__summary a,
+  .enquiry__status a {
+    color: #a50d26;
+    font-weight: 600;
+  }
+
+  .enquiry__status[data-tone='info'] {
+    border-left-color: #8a6400;
+    background: rgb(242 183 5 / 0.12);
+  }
+
+  [data-submit][aria-busy='true'] {
+    opacity: 0.75;
+    cursor: progress;
+  }
+
+  .enquiry__success {
+    display: grid;
+    gap: var(--s-4);
+    justify-items: start;
+    padding: clamp(var(--s-6), 5vw, var(--s-8));
+    border: 1px solid var(--line-on-light);
+    background: var(--white);
+  }
+
+  .enquiry__success:focus {
+    outline: none;
+  }
+
+  .enquiry__success a:not(.btn) {
+    color: #a50d26;
+    font-weight: 600;
+  }
+
+  .enquiry__success .btn-row {
+    margin-top: var(--s-3);
+  }
+
+  .enquiry__success-icon {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--red);
+    color: var(--white);
+  }
+
+  .enquiry__success-icon :global(svg) {
+    width: 26px;
+    height: 26px;
+  }
+</style>
+
+<script>
+  type Rule = (value: string, form: HTMLFormElement) => string | null
+
+  const root = document.querySelector<HTMLElement>('[data-enquiry]')
+  const form = root?.querySelector<HTMLFormElement>('form')
+
+  if (root && form) {
+    const summary = form.querySelector<HTMLElement>('[data-error-summary]')!
+    const status = form.querySelector<HTMLElement>('[data-status]')!
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!
+    const submitLabel = form.querySelector<HTMLElement>('[data-submit-label]')!
+    const success = root.querySelector<HTMLElement>('[data-success]')!
+    const failureTemplate = root.querySelector<HTMLTemplateElement>('[data-failure-template]')!
+    const guardian = form.querySelector<HTMLElement>('[data-guardian]')!
+    const isLive = () => form.dataset.formsLive === 'true'
+
+    // JavaScript handles validation from here; native validation is the no-JS fallback.
+    form.noValidate = true
+
+    const forChild = () => (form.elements.namedItem('enquiry_for') as RadioNodeList).value === 'My child'
+
+    const updateGuardian = () => {
+      const show = forChild()
+      guardian.hidden = !show
+      const input = guardian.querySelector('input')!
+      input.required = show
+      if (!show) clearError('guardian_name')
+    }
+    form.querySelectorAll('input[name="enquiry_for"]').forEach((r) => r.addEventListener('change', updateGuardian))
+    updateGuardian()
+
+    const digits = (v: string) => v.replace(/\D/g, '')
+
+    const rules: Record<string, Rule> = {
+      student_name: (v) => (v.trim().length < 2 ? 'Enter the student’s name.' : null),
+      student_age: (v) => {
+        if (!v.trim()) return null
+        const n = Number(v)
+        return Number.isInteger(n) && n >= 3 && n <= 99 ? null : 'Enter an age between 3 and 99, or leave it blank.'
+      },
+      guardian_name: (v) => (forChild() && v.trim().length < 2 ? 'Enter the parent or guardian’s name.' : null),
+      phone: (v) => {
+        if (!v.trim()) return 'Enter a phone number so the academy can reply.'
+        if (!/^[+\d\s()-]+$/.test(v.trim())) return 'Use only numbers, spaces, brackets, dashes and an optional +.'
+        const n = digits(v).length
+        return n >= 10 && n <= 15 ? null : 'Enter a phone number with 10 to 15 digits, for example 98765 43210.'
+      },
+      email: (v) =>
+        !v.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? null : 'Enter an email address like name@example.com, or leave it blank.',
+      consent: (_v, f) =>
+        (f.elements.namedItem('consent') as HTMLInputElement).checked ? null : 'Tick this box so the academy can contact you.',
+    }
+
+    function setError(name: string, message: string) {
+      const el = form!.elements.namedItem(name) as HTMLInputElement
+      el.setAttribute('aria-invalid', 'true')
+      const out = form!.querySelector<HTMLElement>(`[data-error-for="${name}"]`)
+      if (out) out.textContent = message
+    }
+
+    function clearError(name: string) {
+      const el = form!.elements.namedItem(name) as HTMLInputElement
+      el.removeAttribute('aria-invalid')
+      const out = form!.querySelector<HTMLElement>(`[data-error-for="${name}"]`)
+      if (out) out.textContent = ''
+    }
+
+    function validateField(name: string) {
+      const el = form!.elements.namedItem(name) as HTMLInputElement
+      const message = rules[name](el.value, form!)
+      if (message) setError(name, message)
+      else clearError(name)
+      return message
+    }
+
+    // Re-check a field once the user has left it, and live once it has an error.
+    for (const name of Object.keys(rules)) {
+      const el = form.elements.namedItem(name) as HTMLInputElement
+      el.addEventListener('blur', () => {
+        if (el.value || el.getAttribute('aria-invalid')) validateField(name)
+      })
+      el.addEventListener(el.type === 'checkbox' ? 'change' : 'input', () => {
+        if (el.getAttribute('aria-invalid')) validateField(name)
+      })
+    }
+
+    function showStatus(html: string | DocumentFragment, tone: 'error' | 'info') {
+      status.replaceChildren(typeof html === 'string' ? document.createRange().createContextualFragment(html) : html)
+      status.dataset.tone = tone
+      status.hidden = false
+    }
+
+    function setBusy(busy: boolean) {
+      submit.setAttribute('aria-busy', String(busy))
+      submit.disabled = busy
+      submitLabel.textContent = busy ? 'Sending…' : 'Send enquiry'
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault()
+      status.hidden = true
+
+      const errors = Object.keys(rules)
+        .map((name) => ({ name, message: validateField(name) }))
+        .filter((e): e is { name: string; message: string } => Boolean(e.message))
+
+      if (errors.length) {
+        const list = document.createElement('ul')
+        for (const { name, message } of errors) {
+          const li = document.createElement('li')
+          const a = document.createElement('a')
+          const el = form.elements.namedItem(name) as HTMLInputElement
+          a.href = `#${el.id || name}`
+          a.textContent = message
+          a.addEventListener('click', (e) => {
+            e.preventDefault()
+            el.focus()
+          })
+          li.append(a)
+          list.append(li)
+        }
+        const heading = document.createElement('strong')
+        heading.textContent = errors.length === 1 ? 'Please fix 1 problem:' : `Please fix ${errors.length} problems:`
+        summary.replaceChildren(heading, list)
+        summary.hidden = false
+        summary.focus()
+        return
+      }
+      summary.hidden = true
+
+      if (!isLive()) {
+        showStatus(
+          '<strong>This preview can’t send enquiries.</strong> The form only sends from the deployed Netlify site, so nothing was submitted.',
+          'info',
+        )
+        return
+      }
+
+      setBusy(true)
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 15000)
+      try {
+        const body = new URLSearchParams(new FormData(form) as unknown as Record<string, string>).toString()
+        const res = await fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body,
+          signal: controller.signal,
+        })
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        form.reset()
+        form.hidden = true
+        success.hidden = false
+        success.focus()
+        success.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      } catch {
+        showStatus(failureTemplate.content.cloneNode(true) as DocumentFragment, 'error')
+      } finally {
+        clearTimeout(timeout)
+        setBusy(false)
+      }
+    })
+  }
+</script>
