@@ -31,9 +31,12 @@ const events = defineCollection({
   }),
 })
 
-/** Blog posts: one Markdown file per post in src/content/blog/. */
+/**
+ * Blog posts: one Markdown file per post in src/content/blog/. Posts with
+ * `draft: true` (like example-post.md) are never published.
+ */
 const blog = defineCollection({
-  loader: glob({ pattern: '**/[^_]*.md', base: './src/content/blog' }),
+  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),

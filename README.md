@@ -46,7 +46,7 @@ Work through the checklist, mark items `confirmed: true`, then set it to
 | Gallery photos (files in `src/assets/gallery/`) | `src/data/gallery.ts` |
 | Hero photo | `src/data/media.ts` |
 | Events: tournaments, belt exams | One Markdown file each in `src/content/events/`. Copy `_template.md`. |
-| Blog posts | One Markdown file each in `src/content/blog/`. Copy `_example-post.md`. |
+| Blog posts | One Markdown file each in `src/content/blog/`. Copy `example-post.md`. |
 | About page story | `src/pages/about.astro` |
 | Colours, type, spacing | `src/styles/global.css` (`:root`) |
 
@@ -88,17 +88,54 @@ Collected fields: who it's for, student's name and (optional) age,
 parent/guardian name, phone, optional email, area, experience, contact
 preference, message and consent. No dates of birth, addresses or ID numbers.
 
-## Deploy to Netlify
+## Deploy to Netlify (free tier)
 
-1. Push this repository to GitHub.
-2. In Netlify: **Add new site → Import an existing project**, then pick the
-   repository. Build settings come from `netlify.toml` (`npm run build` →
-   `dist`, Node 24).
-3. Enable form detection (above).
-4. Optional: add a custom domain. Canonical URLs, the sitemap and social
-   images use Netlify's `URL` automatically; set `SITE_URL` to override.
+This is a **separate Netlify site** from any other project (for example a
+portfolio). Creating it doesn't touch other sites or their settings.
+
+| Setting | Value (already in `netlify.toml`) |
+| --- | --- |
+| Framework | Astro 7, static output; no adapter or functions needed |
+| Build command | `npm run build` (type-check, then build) |
+| Publish directory | `dist` |
+| Node version | 24 (`NODE_VERSION`) |
+| Environment variables | Only `PUBLIC_CONTENT_REVIEW` (set in `netlify.toml`). **No secrets or API keys.** |
+
+### One-time setup
+
+1. Sign in at [app.netlify.com](https://app.netlify.com) (the free *Starter*
+   plan is enough).
+2. **Add new project → Import an existing project → GitHub.** If
+   `The-enlit-dev/VSA` isn't listed, choose **Configure the Netlify app on
+   GitHub** and grant it access to the VSA repository (or all repositories).
+3. Pick **The-enlit-dev/VSA**.
+4. **Branch to deploy:** choose the branch that holds the site. Today that is
+   `claude/vsa-karate-redesign-h3zy1z`. If you later make `main` the default
+   branch, change it under **Project configuration → Build & deploy →
+   Branches and deploy contexts**.
+5. Leave the build settings as Netlify fills them in from `netlify.toml`,
+   optionally set a project name (e.g. `vsa-karate`, giving
+   `https://vsa-karate.netlify.app`), and click **Deploy**.
+6. **Forms:** go to **Project configuration → Forms**, click **Enable form
+   detection**, then **Deploys → Trigger deploy → Deploy project** so Netlify
+   registers the `enquiry` form.
+7. **Email notifications:** **Project configuration → Notifications → Emails
+   and webhooks → Form submission notifications → Add notification → Email
+   notification**, form `enquiry`, and the academy's confirmed email address.
+8. **Test it:** open `/register/` on the live site, send a test enquiry, and
+   check that it appears under **Forms → enquiry** and that the email arrives.
+
+Canonical URLs, the sitemap and social images use Netlify's `URL`
+automatically. Set `SITE_URL` to override, e.g. once a custom domain is
+added under **Domain management**.
+
+**At launch**, set `PUBLIC_CONTENT_REVIEW = "false"` in `netlify.toml`, commit
+and push. Netlify rebuilds, and unconfirmed details and placeholders disappear.
 
 ## Testing
+
+GitHub Actions (`.github/workflows/ci.yml`) runs the type-check, build and
+the full test suite on every push, in both content-review modes.
 
 `npm test` serves `dist/` like Netlify does and uses Playwright + axe-core to
 check:

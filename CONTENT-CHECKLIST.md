@@ -81,7 +81,7 @@ remaining unconfirmed item and placeholder from the live site.
 
 | # | Item | Where to add |
 | --- | --- | --- |
-| 29 | Posts from the Wix blog worth carrying over (title, date, text, photo) | `src/content/blog/` (copy `_example-post.md`) |
+| 29 | Posts from the Wix blog worth carrying over (title, date, text, photo) | `src/content/blog/` (copy `example-post.md`) |
 
 ## 8. Launch
 

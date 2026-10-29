@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        # Test both what the preview shows and what launches.
+        content_review: ['true', 'false']
+    name: build & test (content review ${{ matrix.content_review }})
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check and build
+        run: npm run build
+        env:
+          PUBLIC_CONTENT_REVIEW: ${{ matrix.content_review }}
+
+      - name: Install Playwright (test-only, not a project dependency)
+        run: |
+          npm install --no-save playwright@1.63.0
+          npx playwright install --with-deps chromium
+
+      - name: End-to-end tests
+        run: npm test
