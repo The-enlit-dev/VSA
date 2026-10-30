@@ -104,22 +104,25 @@ portfolio). Creating it doesn't touch other sites or their settings.
 
 ### One-time setup
 
-1. Sign in at [app.netlify.com](https://app.netlify.com) (the free *Starter*
-   plan is enough).
-2. **Add new project → Import an existing project → GitHub.** If
-   `The-enlit-dev/VSA` isn't listed, choose **Configure the Netlify app on
-   GitHub** and grant it access to the VSA repository (or all repositories).
+A Netlify project for this site already exists: **`vsa-karate`**
+(<https://app.netlify.com/projects/vsa-karate>, free plan, Forms enabled). It
+has no deploy yet, so it needs linking to this repository once:
+
+1. Open the project in Netlify: **Project configuration → Build & deploy →
+   Continuous deployment → Link repository** (on a project with no deploys,
+   the overview page also shows **Link to Git provider**).
+2. Choose **GitHub**. If `The-enlit-dev/VSA` isn't listed, choose **Configure
+   the Netlify app on GitHub** and grant it access to the VSA repository.
 3. Pick **The-enlit-dev/VSA**.
-4. **Branch to deploy:** choose the branch that holds the site. Today that is
-   `claude/vsa-karate-redesign-h3zy1z`. If you later make `main` the default
-   branch, change it under **Project configuration → Build & deploy →
-   Branches and deploy contexts**.
-5. Leave the build settings as Netlify fills them in from `netlify.toml`,
-   optionally set a project name (e.g. `vsa-karate`, giving
-   `https://vsa-karate.netlify.app`), and click **Deploy**.
-6. **Forms:** go to **Project configuration → Forms**, click **Enable form
-   detection**, then **Deploys → Trigger deploy → Deploy project** so Netlify
-   registers the `enquiry` form.
+4. **Branch to deploy:** `claude/vsa-karate-redesign-h3zy1z` (today the
+   repository's only branch). If `main` becomes the default later, change it
+   under **Branches and deploy contexts**.
+5. Keep the build settings Netlify reads from `netlify.toml` and click
+   **Deploy**. The site appears at `https://vsa-karate.netlify.app`.
+
+6. **Forms:** form detection is already enabled on the project. After the
+   first deploy, check **Forms** lists `enquiry`. If it doesn't, trigger
+   another deploy (**Deploys → Trigger deploy → Deploy project**).
 7. **Email notifications:** **Project configuration → Notifications → Emails
    and webhooks → Form submission notifications → Add notification → Email
    notification**, form `enquiry`, and the academy's confirmed email address.
