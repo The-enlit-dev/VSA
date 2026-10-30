@@ -29,7 +29,11 @@ export const coaches: Coach[] = [
     name: 'Sensei Preetam Ichake',
     role: fact('President, Vishwa Sports Academy', true),
     credentials: [
-      fact('Chief Instructor, TSSKO Pimpri Chinchwad', false, 'mydvc.in business profile for Vishwa Sports Academy'),
+      fact(
+        'Chief Instructor, TSSKO (Traditional Shotokan and Sports Karate Organisation), Pimpri Chinchwad',
+        false,
+        'mydvc.in business profile. The Wix site confirms only that VSA hosted Vishwa Cup 4 in affiliation with TSSKO.',
+      ),
       fact('Karate rank / dan grade', false, 'Not available in any source we could check'),
     ],
     bio: [
@@ -44,5 +48,23 @@ export const coaches: Coach[] = [
       ),
     ],
     confirmed: true,
+  },
+  {
+    id: 'sanket-shewale',
+    name: 'Sanket Shewale',
+    role: fact(
+      'Contact for classes and the Vishwa Cup',
+      true,
+      'Wix blog posts of Dec 2024 (“Sanket Sir”) and Jan 2025 (“Mr. Sanket Shewale”)',
+    ),
+    credentials: [fact('Coaching role and qualifications', false, 'Not stated on the Wix site')],
+    bio: [
+      fact(
+        'Named on the academy’s site as the person to call about classes and about registration for Vishwa Cup 4.',
+        true,
+      ),
+    ],
+    // Shown only in review mode until the academy confirms his coaching role.
+    confirmed: false,
   },
 ]

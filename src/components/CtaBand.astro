@@ -1,6 +1,6 @@
 ---
 import { registerHref } from '../data/site'
-import { phone, whatsappHref } from '../lib/contact'
+import { phone, confirmedWhatsappHref } from '../lib/contact'
 import Icon from './Icon.astro'
 
 interface Props {
@@ -12,7 +12,7 @@ const {
   title = 'Your first class starts with a conversation.',
   text = 'Tell the academy a little about who wants to train. They’ll reply with current batch timings, fees and how to get started.',
 } = Astro.props
-const wa = whatsappHref()
+const wa = confirmedWhatsappHref()
 ---
 
 <section class="cta" aria-labelledby="cta-title">
@@ -35,7 +35,7 @@ const wa = whatsappHref()
         {
           phone && (
             <a href={phone.href} class="btn cta__secondary">
-              <Icon name="phone" /> Call
+              <Icon name="phone" /> Call {phone.display}
             </a>
           )
         }

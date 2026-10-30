@@ -85,8 +85,9 @@ JavaScript, the browser posts the form directly and Netlify redirects to
 `/register/thanks/`.
 
 Collected fields: who it's for, student's name and (optional) age,
-parent/guardian name, phone, optional email, area, experience, contact
-preference, message and consent. No dates of birth, addresses or ID numbers.
+parent/guardian name, phone, optional email, area, experience, preferred days
+and times, contact preference, message and consent (modelled on the Wix
+registration form, minus its gender and home-address questions). No dates of birth, addresses or ID numbers.
 
 ## Deploy to Netlify (free tier)
 

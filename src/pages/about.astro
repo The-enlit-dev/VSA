@@ -18,25 +18,35 @@ const shownLocations = visible(locations)
  */
 const story = [
   fact(
-    `${academy.name} (VSA) is a karate academy led by its president, ${academy.president}.`,
+    `${academy.name} (VSA) is a karate academy in ${academy.area.text}, led by its president, ${academy.president}.`,
     true,
   ),
   fact(
-    'The academy’s history, philosophy and training approach — in its own words — will appear here.',
+    'It trains students from the age of 4, whether they want self-defence, fitness or competition, and prepares them for district, state, national and international tournaments.',
+    true,
+    'Wix blog post, 21 January 2025',
+  ),
+  fact(
+    'VSA also presents the Vishwa Cup, a state-level invitational karate championship. Its fourth edition, in December 2024, was hosted in affiliation with the Traditional Shotokan and Sports Karate Organisation (TSSKO).',
+    true,
+    'Wix blog post, 5 December 2024',
+  ),
+  fact(
+    'The academy’s history and training philosophy, in its own words, will appear here.',
     false,
-    'Placeholder: copy from the Wix "About Us" page',
+    'Placeholder: the Wix “About Us” page text could not be read through the Wix API. Paste it in or supply new text.',
   ),
 ]
 ---
 
 <BaseLayout
   title="About Us"
-  description={`About ${academy.name} (VSA): a karate academy led by its president, ${academy.president}, with graded belt examinations and tournament opportunities.`}
+  description={`About ${academy.name} (VSA): a karate academy in Pimpri-Chinchwad led by ${academy.president}, training students from age 4 and presenting the Vishwa Cup championship.`}
 >
   <PageHero
     eyebrow="About us"
     title="About Vishwa Sports Academy"
-    lead={`A karate academy led by its president, ${academy.president}.`}
+    lead={academy.motto}
     kanji="空手"
   />
 
@@ -110,8 +120,8 @@ const story = [
           <SectionHead eyebrow="Where we train" title="Locations" id="locations-title" split>
             {REVIEW_MODE && (
               <p class="muted">
-                These addresses come from public business listings and must be checked by the academy. The full list of
-                branches is also still to be confirmed.
+                Aundh comes from the academy’s own announcement. The other addresses come from public business listings
+                and must be checked by the academy, as must the full list of branches.
               </p>
             )}
           </SectionHead>
@@ -125,6 +135,7 @@ const story = [
                     {needsTag(loc) && <ConfirmTag source={loc.source} />}
                   </h3>
                   <p class="muted">{loc.address}</p>
+                  {loc.note && <p class="location__note">{loc.note}</p>}
                   {loc.mapUrl && (
                     <a class="text-link" href={loc.mapUrl} target="_blank" rel="noopener noreferrer">
                       Open in Maps <Icon name="arrow" />
@@ -245,6 +256,11 @@ const story = [
     height: 24px;
     flex: none;
     color: var(--red-on-dark);
+  }
+
+  .location__note {
+    font-size: 0.85rem;
+    color: var(--muted);
   }
 
   .location div {

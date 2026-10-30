@@ -2,22 +2,27 @@
 
 ## 1. Audit of the existing Wix site
 
-**Access.** The live Wix site could not be inspected. The build environment's
-network policy blocked `attharvaagarwal20.wixsite.com`, `static.wixstatic.com`
-(its images) and `web.archive.org`. Web search found no indexed copy of it.
-What is known about it comes from the project brief:
+**Access.** The first pass couldn't reach the site at all: this build
+environment's network policy blocks `wixsite.com` and `static.wixstatic.com`.
+On 30 October 2026 the site was inspected **read-only through the Wix
+connector**. That covered its business info, blog posts, registration form,
+media library, store and bookings (see the table in
+[CONTENT-CHECKLIST.md](CONTENT-CHECKLIST.md)). Nothing on Wix was changed.
 
-| Area | What the brief says exists |
+What the inspection showed:
+
+| Area | Finding |
 | --- | --- |
-| Navigation | Home · Register · Our Coaches · Gallery · Next Tournament / Belt Exam · About Us · Blog |
-| People | Sensei Preetam Ichake, academy president |
-| Content | Information about karate training and the academy |
-| Issues | Two conflicting email addresses |
+| Navigation (from the brief) | Home · Register · Our Coaches · Gallery · Next Tournament / Belt Exam · About Us · Blog |
+| Business info | "VSA Karate", Pimpri-Chinchwad; contact email and phone are still **Wix template placeholders** (`info@mysite.com`, `123-456-7890`) |
+| Blog | 2 posts: the Aundh batch launch (Jan 2025) and Vishwa Cup 4 (Dec 2024). These hold the only verifiable class, contact and event details. |
+| Registration | A Wix Form asking for name, email, phone, home address, gender, availability and a star rating |
+| Installed but unused | Bookings (no services), Stores (no products), a Hotels app (template leftover), Chat |
+| Not readable via API | The text and images of the Classic Editor pages, including the two conflicting email addresses |
 
 Public listings (Instagram `@vishwasports`, Justdial, Bookmyplayer, mydvc.in,
-a school news page) add details, but some conflict with each other. They are
-used only as clearly tagged, unconfirmed hints (see
-[CONTENT-CHECKLIST.md](CONTENT-CHECKLIST.md)).
+a school news page) add further details, but some conflict with each other.
+They are used only as clearly tagged, unconfirmed hints.
 
 **What the new site keeps.** All seven sections of the original navigation:
 
@@ -31,13 +36,17 @@ used only as clearly tagged, unconfirmed hints (see
 | About Us | `/about/` |
 | Blog | `/blog/` |
 
-**Typical weaknesses of the Wix build that this rebuild addresses.** These are
-general to Wix template sites, not observations of this one:
+**Weaknesses of the Wix build that this rebuild addresses.**
 
-- heavy page weight and script-driven rendering, which is slow on phones;
-- limited control over metadata, structured data and accessibility;
-- a registration journey that relies on a third-party form widget;
-- content locked in an editor rather than in versioned, reviewable files.
+- Template placeholder contact details are still in the site's business info,
+  so they can leak into search results and Wix-generated pages.
+- The only class and event information is buried in blog posts; there is no
+  structured classes or events page.
+- The registration form asks for more than it needs (gender, home address,
+  a star rating) and gives no feedback beyond Wix's defaults.
+- Unused apps (Hotels, Stores, Bookings) add weight and confusion.
+- Limited control over metadata, accessibility and performance, and content is
+  locked in an editor rather than in versioned, reviewable files.
 
 ## 2. Direction
 

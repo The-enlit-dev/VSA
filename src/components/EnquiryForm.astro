@@ -11,11 +11,11 @@
  * sends nothing. Field names here must stay stable: renaming one creates a
  * new column in Netlify.
  */
-import { phone, whatsappHref } from '../lib/contact'
+import { phone, confirmedWhatsappHref } from '../lib/contact'
 import Icon from './Icon.astro'
 
 const formsLive = process.env.NETLIFY === 'true' || process.env.FORMS_LIVE === 'true'
-const wa = whatsappHref()
+const wa = confirmedWhatsappHref()
 ---
 
 <div class="enquiry" data-enquiry>
@@ -105,6 +105,12 @@ const wa = whatsappHref()
           <label class="choice"><input type="radio" name="contact_preference" value="Email" /> <span>Email</span></label>
         </div>
       </fieldset>
+    </div>
+
+    <div class="field">
+      <label for="preferred_times">Preferred days and times <span class="field__optional">(optional)</span></label>
+      <input id="preferred_times" name="preferred_times" type="text" maxlength="120" aria-describedby="preferred_times-hint" />
+      <p class="field__hint" id="preferred_times-hint">For example, “weekday evenings” or “Monday, Wednesday, Friday after 6 pm”.</p>
     </div>
 
     <div class="field">

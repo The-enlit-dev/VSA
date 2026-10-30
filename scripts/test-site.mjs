@@ -24,7 +24,7 @@ const axeSource = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8')
 // Set TEST_URL to test a server that is already running (e.g. a Netlify deploy preview).
 const PORT = 4329
 const BASE = (process.env.TEST_URL || `http://localhost:${PORT}`).replace(/\/$/, '')
-const PAGES = ['/', '/about/', '/coaches/', '/events/', '/gallery/', '/blog/', '/register/', '/register/thanks/']
+let PAGES = ['/', '/about/', '/coaches/', '/events/', '/gallery/', '/blog/', '/register/', '/register/thanks/']
 
 let failures = 0
 const fail = (msg) => {
@@ -56,6 +56,13 @@ if (!process.env.TEST_URL) {
   }).listen(PORT)
 }
 const stop = () => server?.close()
+
+// Also test every page listed in the sitemap (blog posts and anything added later).
+{
+  const xml = await (await fetch(`${BASE}/sitemap.xml`)).text()
+  const fromSitemap = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname)
+  PAGES = [...new Set([...PAGES, ...fromSitemap])]
+}
 
 const browser = await chromium.launch()
 
@@ -201,6 +208,7 @@ console.log('\nEnquiry form')
   await page.fill('#phone', '+91 98765 43210')
   await page.fill('#email', 'parent@example.com')
   await page.fill('#student_age', '12')
+  await page.fill('#preferred_times', 'Weekday evenings')
   await page.check('input[name="consent"]')
   check((await page.locator('[aria-invalid="true"]').count()) === 0, 'errors clear once fixed')
 
@@ -242,7 +250,10 @@ console.log('\nEnquiry form')
   check(await page.locator('[data-success]').isVisible(), 'accepted submission shows the success message')
   const params = new URLSearchParams(body)
   check(
-    params.get('form-name') === 'enquiry' && params.get('student_name') === 'Test Student' && params.get('consent') === 'Yes',
+    params.get('form-name') === 'enquiry' &&
+      params.get('student_name') === 'Test Student' &&
+      params.get('preferred_times') === 'Weekday evenings' &&
+      params.get('consent') === 'Yes',
     'payload is URL-encoded with form-name and field values',
   )
   await page.close()

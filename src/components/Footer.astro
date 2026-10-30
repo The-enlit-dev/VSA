@@ -1,5 +1,5 @@
 ---
-import { academy, contact, locations, nav, registerHref, siteCredit } from '../data/site'
+import { academy, contact, contactPerson, locations, nav, registerHref, siteCredit } from '../data/site'
 import { email, phone, visibleSocials, whatsappHref } from '../lib/contact'
 import { REVIEW_MODE, needsTag, visible } from '../lib/review'
 import ConfirmTag from './ConfirmTag.astro'
@@ -37,6 +37,7 @@ const year = new Date().getFullYear()
             phone ? (
               <li>
                 <a href={phone.href}><Icon name="phone" /> {phone.display}</a>
+                <span class="muted site-footer__who">({contactPerson.name})</span>
                 {needsTag(contact.phone) && <ConfirmTag source={contact.phone.source} />}
               </li>
             ) : (
@@ -53,6 +54,7 @@ const year = new Date().getFullYear()
                 <a href={wa} target="_blank" rel="noopener noreferrer">
                   <Icon name="whatsapp" /> WhatsApp us<span class="visually-hidden"> (opens WhatsApp)</span>
                 </a>
+                {needsTag(contact.whatsapp) && <ConfirmTag source={contact.whatsapp.source} />}
               </li>
             ) : (
               REVIEW_MODE && (
@@ -207,6 +209,10 @@ const year = new Date().getFullYear()
     width: 18px;
     height: 18px;
     flex: none;
+  }
+
+  .site-footer__who {
+    font-size: 0.82rem;
   }
 
   .site-footer__locations li {

@@ -2,18 +2,9 @@
  * Training content.
  *
  * `foundations` describes karate itself (not claims about the academy), so it
- * is always shown. `programmes` is the list of class options the academy
- * actually runs. It is empty until the academy confirms its batches: when it
- * is empty, the site asks visitors to enquire for current details instead.
- *
- * Example programme entry:
- *   {
- *     name: 'Junior batch',
- *     audience: 'Ages 6–12',
- *     schedule: 'Mon, Wed, Fri · 5:30–6:30 pm',
- *     location: 'Chikhali',
- *     description: 'Fundamentals, kata and belt preparation for younger students.',
- *   }
+ * is always shown. `programmes` lists class options the academy has published;
+ * `offers` lists what the academy says its training includes. Both come from
+ * the academy's own Wix site (blog post of 21 Jan 2025).
  */
 
 export interface Programme {
@@ -22,9 +13,49 @@ export interface Programme {
   schedule?: string
   location?: string
   description: string
+  /** Shown under the details, e.g. when timings may have changed. */
+  note?: string
 }
 
-export const programmes: Programme[] = []
+export const programmes: Programme[] = [
+  {
+    name: 'Karate class, Aundh',
+    audience: 'Ages 4 and above · beginners and experienced students',
+    schedule: 'Monday, Wednesday, Friday · 6:30–7:30 pm',
+    location: 'EuroKids Preschool, Aundh',
+    description:
+      'A batch for self-defence, fitness or competitive training, focused on overall physical and mental development.',
+    note: 'Timings as announced for the batch launch on 1 February 2025. Ask the academy for the current schedule.',
+  },
+]
+
+/** What the academy says its programme offers (its own words, lightly edited). */
+export const offers = [
+  {
+    title: 'Experienced coaches',
+    text: 'A professional karate club and training programme with experienced, national-medallist coaches.',
+  },
+  {
+    title: 'A free demo week',
+    text: 'New batches have opened with a one-week free demo class, to see whether the training is the right fit.',
+  },
+  {
+    title: 'Tournament preparation',
+    text: 'Students are prepared for district, state, national and international tournaments.',
+  },
+  {
+    title: 'Fitness and focus',
+    text: 'Drills for agility, endurance, speed and focus that build immunity and self-confidence.',
+  },
+  {
+    title: 'Diet guidance',
+    text: 'Personalised diet plans to help students maintain a strong, healthy BMI.',
+  },
+  {
+    title: 'Ages 4 and up',
+    text: 'Training for students of all ages from 4 years, whether for self-defence, fitness or competition.',
+  },
+] as const
 
 export const foundations = [
   {
@@ -63,7 +94,7 @@ export const pathway = [
   },
   {
     title: 'Tournaments',
-    description: 'Opportunities to compete, with upcoming tournaments listed as they are announced.',
+    description: 'Preparation for district, state, national and international tournaments, including the academy’s own Vishwa Cup.',
     href: '/events/',
   },
 ] as const

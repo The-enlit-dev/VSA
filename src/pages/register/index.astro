@@ -4,7 +4,7 @@ import PageHero from '../../components/PageHero.astro'
 import EnquiryForm from '../../components/EnquiryForm.astro'
 import ConfirmTag from '../../components/ConfirmTag.astro'
 import Icon from '../../components/Icon.astro'
-import { academy, contact } from '../../data/site'
+import { academy, contact, contactPerson } from '../../data/site'
 import { email, phone, whatsappHref } from '../../lib/contact'
 import { REVIEW_MODE, needsTag } from '../../lib/review'
 
@@ -55,6 +55,7 @@ const steps = [
                     <a href={wa} class="btn btn-secondary btn-whatsapp" target="_blank" rel="noopener noreferrer">
                       <Icon name="whatsapp" /> WhatsApp the academy<span class="visually-hidden"> (opens WhatsApp)</span>
                     </a>
+                    {needsTag(contact.whatsapp) && <ConfirmTag source={contact.whatsapp.source} />}
                   </li>
                 ) : (
                   REVIEW_MODE && (
@@ -66,6 +67,7 @@ const steps = [
                 {phone ? (
                   <li>
                     <a href={phone.href} class="register__contact"><Icon name="phone" /> {phone.display}</a>
+                    <span class="muted register__who">{contactPerson.name}</span>
                     {needsTag(contact.phone) && <ConfirmTag source={contact.phone.source} />}
                   </li>
                 ) : (
@@ -166,6 +168,10 @@ const steps = [
     flex-wrap: wrap;
     align-items: center;
     gap: var(--s-2);
+  }
+
+  .register__who {
+    font-size: 0.85rem;
   }
 
   .register__contact {

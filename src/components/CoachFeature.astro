@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets'
 import type { Coach } from '../data/coaches'
-import { REVIEW_MODE, isVisible } from '../lib/review'
+import { REVIEW_MODE, isVisible, needsTag } from '../lib/review'
 import ConfirmTag from './ConfirmTag.astro'
 import FactText from './FactText.astro'
 
@@ -56,6 +56,7 @@ const bio = full ? coach.bio : coach.bio.slice(0, 1)
       {honorific && <span class="coach__honorific">{honorific}</span>}
       {rest.join(' ')}
     </H>
+    {needsTag(coach) && <p class="coach__pending"><ConfirmTag label="Profile to confirm" source="This person's coaching role is not stated on the academy's site" /></p>}
 
     {
       credentials.length > 0 && (
@@ -165,6 +166,14 @@ const bio = full ? coach.bio : coach.bio.slice(0, 1)
     text-transform: uppercase;
     line-height: 0.9;
     font-variation-settings: 'wdth' 118;
+  }
+
+  .coach__pending {
+    margin-top: var(--s-3);
+  }
+
+  .coach__pending :global(.confirm-tag) {
+    margin-left: 0;
   }
 
   .coach__honorific {

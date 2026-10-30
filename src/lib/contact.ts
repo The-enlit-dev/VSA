@@ -19,4 +19,8 @@ export const whatsappHref = (message = whatsappMessage) =>
     ? `https://wa.me/${digits(contact.whatsapp.text)}?text=${encodeURIComponent(message)}`
     : null
 
+/** Like whatsappHref, but only once the number is confirmed (for places without room for a tag). */
+export const confirmedWhatsappHref = (message = whatsappMessage) =>
+  contact.whatsapp.confirmed ? whatsappHref(message) : null
+
 export const visibleSocials = socials.filter(isVisible)

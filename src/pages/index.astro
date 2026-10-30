@@ -10,37 +10,18 @@ import FactText from '../components/FactText.astro'
 import Icon from '../components/Icon.astro'
 import { academy, registerHref } from '../data/site'
 import { coaches } from '../data/coaches'
-import { foundations, pathway, programmes } from '../data/training'
+import { foundations, offers, pathway, programmes } from '../data/training'
 import { photos } from '../data/gallery'
 import { getEvents } from '../lib/events'
-import { REVIEW_MODE, visible, isVisible } from '../lib/review'
-import ConfirmTag from '../components/ConfirmTag.astro'
+import { visible, isVisible } from '../lib/review'
 
 const { upcoming, past } = await getEvents()
 const shownCoaches = visible(coaches)
 const shownPhotos = visible(photos).slice(0, 6)
 
-const reasons = [
-  {
-    title: 'Led from the top',
-    text: 'Training at VSA is led by Sensei Preetam Ichake, the academy’s president.',
-  },
-  {
-    title: 'A clear grading pathway',
-    text: 'Belt examinations give every student a defined next step and a standard to work towards.',
-  },
-  {
-    title: 'A reason to compete',
-    text: 'Tournaments are announced through the academy, for students who want to test their karate.',
-  },
-  {
-    title: 'Easy to get started',
-    text: 'Send an enquiry online and the academy will reply with current batches, timings and fees.',
-  },
-]
 ---
 
-<BaseLayout description={`${academy.name} (VSA) offers karate training led by Sensei Preetam Ichake, with graded belt examinations and tournament opportunities. Enquire about classes online.`}>
+<BaseLayout description={`${academy.name} (VSA) teaches karate in Pimpri-Chinchwad and Pune under Sensei Preetam Ichake: classes for ages 4 and up, belt examinations and tournament preparation. Enquire online.`}>
   <Hero />
 
   <!-- C. About -->
@@ -113,32 +94,31 @@ const reasons = [
         </ol>
       </div>
 
-      {
-        programmes.length > 0 ? (
-          <ul class="programmes" role="list">
-            {programmes.map((p) => (
-              <li class="programme" data-reveal>
-                <h3 class="h3">{p.name}</h3>
-                {p.audience && <p class="accent programme__audience">{p.audience}</p>}
-                <p class="muted">{p.description}</p>
-                {(p.schedule || p.location) && (
-                  <p class="programme__meta">{[p.schedule, p.location].filter(Boolean).join(' · ')}</p>
-                )}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div class="empty programmes-empty" data-reveal>
-            <h3>Class options and timings</h3>
+      <div class="programmes-wrap">
+        <h3 class="pathway__title">Classes</h3>
+        <ul class="programmes" role="list">
+          {programmes.map((p) => (
+            <li class="programme" data-reveal>
+              <h4 class="h3">{p.name}</h4>
+              {p.audience && <p class="accent programme__audience">{p.audience}</p>}
+              <p class="muted">{p.description}</p>
+              <ul class="programme__meta" role="list">
+                {p.schedule && <li><Icon name="calendar" /> {p.schedule}</li>}
+                {p.location && <li><Icon name="pin" /> {p.location}</li>}
+              </ul>
+              {p.note && <p class="programme__note">{p.note}</p>}
+              <a href={registerHref} class="text-link">Ask about this class <Icon name="arrow" /></a>
+            </li>
+          ))}
+          <li class="programme programme--enquire" data-reveal style="--reveal-i: 1">
+            <h4 class="h3">Another time or area?</h4>
             <p class="muted">
-              Send an enquiry for current batch timings, age groups and fees, and the academy will help you find the right
-              class.
-              {REVIEW_MODE && <ConfirmTag label="Programmes to add" source="No programme details were available; add them in src/data/training.ts" />}
+              Tell the academy where you live and when you can train, and it will let you know which batches are open.
             </p>
-            <a href={registerHref} class="btn btn-primary">Ask about classes <Icon name="arrow" class="icon-arrow" /></a>
-          </div>
-        )
-      }
+            <a href={registerHref} class="btn btn-primary">Send an enquiry <Icon name="arrow" class="icon-arrow" /></a>
+          </li>
+        </ul>
+      </div>
     </div>
   </section>
 
@@ -221,10 +201,12 @@ const reasons = [
   <!-- H. Why VSA -->
   <section class="section on-light" id="why" aria-labelledby="why-title">
     <div class="container">
-      <SectionHead eyebrow="Why VSA" title="Why train at VSA" id="why-title" />
+      <SectionHead eyebrow="Why VSA" title="What VSA offers" id="why-title" split>
+        <p class="muted">In the academy’s own words, from its announcements.</p>
+      </SectionHead>
       <ol class="reasons" role="list">
         {
-          reasons.map((r, i) => (
+          offers.map((r, i) => (
             <li class="reason" data-reveal style={`--reveal-i: ${i}`}>
               <span class="reason__n">{String(i + 1).padStart(2, '0')}</span>
               <h3 class="reason__title">{r.title}</h3>
@@ -377,28 +359,44 @@ const reasons = [
     color: var(--red-on-dark);
   }
 
-  .programmes,
-  .programmes-empty {
+  .programmes-wrap {
+    display: grid;
+    gap: var(--s-5);
     margin-top: clamp(var(--s-7), 6vw, var(--s-9));
+  }
+
+  @media (min-width: 960px) {
+    .programmes-wrap {
+      grid-template-columns: 14rem 1fr;
+      align-items: start;
+    }
   }
 
   .programmes {
     display: grid;
     gap: var(--s-4);
+    margin: 0;
     padding: 0;
   }
 
   @media (min-width: 760px) {
     .programmes {
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 
   .programme {
     display: grid;
+    align-content: start;
+    justify-items: start;
     gap: var(--s-3);
     padding: var(--s-6);
     border: 1px solid var(--line);
+  }
+
+  .programme--enquire {
+    background: var(--ink-2);
+    align-content: center;
   }
 
   .programme__audience {
@@ -406,8 +404,30 @@ const reasons = [
   }
 
   .programme__meta {
-    font-size: 0.9rem;
+    display: grid;
+    gap: var(--s-2);
+    margin: var(--s-2) 0 0;
+    padding: 0;
+    font-size: 0.95rem;
     font-weight: 600;
+  }
+
+  .programme__meta li {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .programme__meta :global(svg) {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    color: var(--red-on-dark);
+  }
+
+  .programme__note {
+    font-size: 0.85rem;
+    color: var(--muted);
   }
 
   .coach-stack {
@@ -445,10 +465,9 @@ const reasons = [
   /* Reasons */
   .reasons {
     display: grid;
-    gap: 0;
+    gap: 0 var(--s-6);
     margin: 0;
     padding: 0;
-    border-top: 1px solid var(--line);
   }
 
   @media (min-width: 760px) {
@@ -459,7 +478,7 @@ const reasons = [
 
   @media (min-width: 1100px) {
     .reasons {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 
@@ -467,20 +486,8 @@ const reasons = [
     display: grid;
     align-content: start;
     gap: var(--s-3);
-    padding: var(--s-6) var(--s-5) var(--s-6) 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  @media (min-width: 1100px) {
-    .reason {
-      border-bottom: 0;
-      padding-right: var(--s-6);
-    }
-
-    .reason + .reason {
-      padding-left: var(--s-6);
-      border-left: 1px solid var(--line);
-    }
+    padding: var(--s-6) 0;
+    border-top: 1px solid var(--line);
   }
 
   .reason__n {

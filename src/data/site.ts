@@ -1,9 +1,10 @@
 /**
  * Academy details used across the site.
  *
- * Every detail that has not been confirmed by the academy has
- * `confirmed: false` and a `source`. Work through CONTENT-CHECKLIST.md, then
- * change `confirmed` to `true` (or correct the text) for each one.
+ * Details marked `confirmed: true` were checked against the academy's own
+ * Wix site (attharvaagarwal20.wixsite.com/vsa-karate). Details still marked
+ * `confirmed: false` came from elsewhere and carry a `source`. Work through
+ * CONTENT-CHECKLIST.md, then correct them or change `confirmed` to `true`.
  */
 import { fact, type Fact } from '../lib/review'
 
@@ -14,12 +15,18 @@ export const academy = {
   president: 'Sensei Preetam Ichake',
   /** One-line description used in metadata and the footer. */
   tagline: 'Karate training at Vishwa Sports Academy, led by Sensei Preetam Ichake.',
-  area: fact(
-    'Pimpri-Chinchwad (PCMC), Pune',
-    false,
-    'Instagram profile @vishwasports and public business listings (Justdial, mydvc.in)',
-  ),
+  /** The academy's own line, from its Wix site's business info. */
+  motto: 'Empower yourself with VSA Karate! Unleash your inner strength.',
+  area: fact('Pimpri-Chinchwad, Maharashtra', true, 'Wix site business info'),
 } as const
+
+/** People named on the academy's site as the contact for enquiries. */
+export const contactPerson = {
+  name: 'Mr. Sanket Shewale',
+  /** Shown next to the name, e.g. "Call Mr. Sanket Shewale". */
+  role: 'Class enquiries',
+  source: 'Wix blog post “Kickstart Your Karate Journey with Vishwa Sports Academy!” (Jan 2025)',
+}
 
 /**
  * Contact details. Leave a value empty ('') until it is confirmed: empty
@@ -34,11 +41,19 @@ export const contact: {
   /** Shown in review mode next to the email placeholder. */
   emailNote: string
 } = {
-  phone: fact('', false, 'Not found in any source available to us. Copy it from the Wix site.'),
-  whatsapp: fact('', false, 'Use the academy phone number if it is on WhatsApp.'),
-  email: fact('', false, 'The Wix site lists two different email addresses.'),
+  phone: fact('+91 88051 48722', true, contactPerson.source),
+  whatsapp: fact(
+    '+91 88051 48722',
+    false,
+    'Same number as the phone. Confirm it is on WhatsApp before launch.',
+  ),
+  email: fact(
+    '',
+    false,
+    'The Wix site’s business info only holds the template placeholder info@mysite.com. The emails shown on the Wix pages could not be read through the Wix API.',
+  ),
   emailNote:
-    'The current Wix site shows two different email addresses. Confirm which one is monitored before adding it here.',
+    'The Wix site’s pages show two different email addresses, and its business info only has the template placeholder. Confirm which address the academy checks before adding it here.',
 }
 
 /** Message prefilled in every WhatsApp chat started from the site. */
@@ -68,22 +83,32 @@ export interface Location {
   address: string
   /** Optional Google Maps link. */
   mapUrl?: string
+  /** Short extra line, e.g. when a batch started. */
+  note?: string
   confirmed: boolean
   source?: string
 }
 
 export const locations: Location[] = [
   {
+    name: 'Aundh',
+    address: 'EuroKids Preschool, Aundh, Pune',
+    note: 'Batch launched in February 2025',
+    confirmed: true,
+    source: contactPerson.source,
+  },
+  {
+    name: 'Yamunanagar, Nigdi',
+    address: 'Near Minatai Thakrey Skating Hall, Yamunanagar, Nigdi, Pimpri-Chinchwad',
+    confirmed: false,
+    source:
+      'Justdial lists a “Yamunanagar DoJo”. The Wix site confirms only that Vishwa Cup 4 was held at Minatai Thakrey Skating Hall.',
+  },
+  {
     name: 'Chikhali',
     address: 'Sonawane Wasti Road, More Wasti, Chikhali, Pune, Maharashtra 412114',
     confirmed: false,
-    source: 'Bookmyplayer and Justdial listings',
-  },
-  {
-    name: 'Yamunanagar Dojo, Nigdi',
-    address: 'Yamunanagar, Nigdi, Pune, Maharashtra',
-    confirmed: false,
-    source: 'Justdial listing ("Vishwa Sports Academy (Yamunanagar DoJo)")',
+    source: 'Bookmyplayer and Justdial listings; not on the Wix site',
   },
 ]
 
